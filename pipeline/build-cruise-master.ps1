@@ -151,13 +151,19 @@ Step "Fleet physical-configuration survey" {
 }
 
 Step "Archive + append Celebrity evidence registry" {
-  Run-Python @(
-    (Join-Path $PSScriptRoot "..\fleet\registry\archive-and-import-survey-v1.0.py"),
-    "--survey", $Timeline,
-    "--archive-dir", (Join-Path $StateDir "source-surveys\celebrity"),
-    "--registry", $Registry,
-    "--registry-tool", (Join-Path $PSScriptRoot "..\fleet\registry\fleet-configuration-registry-v1.2.py")
-  )
+  $SurveyFile = Join-Path $TimelineOut "celebrity-fleet-timeline-v1.0.json"
+  Require $SurveyFile
+
+  & $Python `
+    (Join-Path $RegistryTool "archive-and-import-survey-v1.0.py") `
+    --survey $SurveyFile `
+    --archive-dir (Join-Path $StateDir "source-surveys\celebrity") `
+    --registry $Registry `
+    --registry-tool (Join-Path $RegistryTool "fleet-configuration-registry-v1.2.py")
+
+  if($LASTEXITCODE -ne 0){
+    throw "Celebrity survey archive/registry import failed with exit code $LASTEXITCODE"
+  }
 }
 
 Write-Host "`nPipeline complete." -ForegroundColor Green
