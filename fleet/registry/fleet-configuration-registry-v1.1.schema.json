@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Fleet Physical Configuration Evidence Registry V1.1",
+  "type": "object",
+  "required": [
+    "version",
+    "kind",
+    "surveys",
+    "observations",
+    "voyages",
+    "conflicts"
+  ],
+  "properties": {
+    "version": {
+      "const": "1.1"
+    },
+    "kind": {
+      "const": "FLEET_PHYSICAL_CONFIGURATION_EVIDENCE_REGISTRY"
+    },
+    "surveys": {
+      "type": "array"
+    },
+    "observations": {
+      "type": "array"
+    },
+    "voyages": {
+      "type": "object"
+    },
+    "conflicts": {
+      "type": "array"
+    }
+  }
+}

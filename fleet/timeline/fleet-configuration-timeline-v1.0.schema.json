@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:cruise:fleet-configuration-timeline:v1.0",
+  "title": "Fleet Configuration Timeline v1.0.5",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "provider",
+    "surveyStartDate",
+    "observations",
+    "observedEras",
+    "transitions"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0"
+    },
+    "provider": {
+      "type": "string"
+    },
+    "surveyStartDate": {
+      "type": "string",
+      "format": "date"
+    },
+    "eligibilityRule": {
+      "const": "sailDate > surveyStartDate"
+    },
+    "observations": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "observedEras": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "transitions": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "description": "Physical configuration timeline plus observational commercial offer signatures. Commercial offer signatures do not define configuration eras."
+}
