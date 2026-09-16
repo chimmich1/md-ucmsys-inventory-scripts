@@ -21,15 +21,15 @@ $TimelineOut=Join-Path $StateDir "fleet-timeline-current"
 if($RegistryPath){
   $Registry=$RegistryPath
 } else {
-  $Registry=Join-Path $StateDir "fleet-physical-configuration-registry-v1.1.json"
+  $Registry=Join-Path $StateDir "fleet-physical-configuration-registry-v1.2.json"
   # Convenience migration path for the validated standalone V1.1 registry.
-  $LegacyRegistry=Join-Path $DataDir "fleet-configuration-registry-v1.1\fleet-physical-configuration-registry-v1.1.json"
+  $LegacyRegistry=Join-Path $DataDir "fleet-configuration-registry-v1.1\fleet-physical-configuration-registry-v1.2.json"
   if(!(Test-Path $Registry) -and (Test-Path $LegacyRegistry)){
     $Registry=$LegacyRegistry
   }
 }
 
-$PipelineVersion="0.3.1"
+$PipelineVersion="0.4.0"
 $RunKey="$SurveyStart-$($Mode.ToLowerInvariant())-v$PipelineVersion"
 $RunDir=Join-Path $StateDir "runs\$RunKey"
 if($RestartRun -and (Test-Path $RunDir)){Remove-Item -Recurse -Force $RunDir}
@@ -107,6 +107,7 @@ if($Mode -eq "Validate"){
     Require $Registry
     $r=Get-Content -Raw $Registry | ConvertFrom-Json
     Write-Host "Registry version: $($r.version)"
+    if($r.version -ne "1.2"){throw "Expected Registry V1.2; found $($r.version)"}
     Write-Host "Observations: $(@($r.observations).Count)"
     Write-Host "Voyages: $(@($r.voyages.PSObject.Properties).Count)"
     Write-Host "Conflicts: $(@($r.conflicts).Count)"
@@ -150,7 +151,7 @@ Step "Fleet physical-configuration survey" {
 }
 
 Step "Append Celebrity evidence registry" {
-  & $Python (Join-Path $RegistryTool "fleet-configuration-registry-v1.1.py") `
+  & $Python (Join-Path $RegistryTool "fleet-configuration-registry-v1.2.py") `
     --registry $Registry `
     --survey (Join-Path $TimelineOut "celebrity-fleet-timeline-v1.0.json")
   if($LASTEXITCODE -ne 0){throw "Registry updater failed with exit code $LASTEXITCODE"}

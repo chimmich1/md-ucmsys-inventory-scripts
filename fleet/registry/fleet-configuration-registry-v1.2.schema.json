@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ucms:fleet-physical-configuration-evidence-registry:v1.2",
+  "title": "Fleet Physical Configuration Evidence Registry V1.2",
+  "type": "object",
+  "required": [
+    "version",
+    "kind",
+    "createdAt",
+    "updatedAt",
+    "surveys",
+    "observations",
+    "voyages",
+    "conflicts",
+    "statistics"
+  ],
+  "properties": {
+    "version": {
+      "const": "1.2"
+    },
+    "kind": {
+      "const": "FLEET_PHYSICAL_CONFIGURATION_EVIDENCE_REGISTRY"
+    },
+    "createdAt": {
+      "type": "string"
+    },
+    "updatedAt": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "surveys": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "sourceSurveyId",
+          "provider",
+          "sourceFileDisplayName",
+          "sourceByteLength",
+          "sourceSha256",
+          "observationCount",
+          "importedAt"
+        ],
+        "properties": {
+          "sourceSurveyId": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "provider": {
+            "type": "string"
+          },
+          "surveyStartDate": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "schemaVersion": {},
+          "sourceFileDisplayName": {
+            "type": "string"
+          },
+          "sourceByteLength": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "sourceSha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "observationCount": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "importedAt": {
+            "type": "string"
+          },
+          "sourceGeneratedAt": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "observations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "sourceSurveyId",
+          "sourceSurveyOrdinal",
+          "provider"
+        ],
+        "properties": {
+          "sourceSurveyId": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "sourceSurveyOrdinal": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "provider": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "voyages": {
+      "type": "object"
+    },
+    "conflicts": {
+      "type": "array"
+    },
+    "statistics": {
+      "type": "object",
+      "required": [
+        "observationCount",
+        "voyageCount",
+        "provenVoyageCount",
+        "unprovenVoyageCount",
+        "currentlyUnobservableButPreviouslyProvenCount",
+        "conflictCount",
+        "surveyCount"
+      ]
+    }
+  }
+}
