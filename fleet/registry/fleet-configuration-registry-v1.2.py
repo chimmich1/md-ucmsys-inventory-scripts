@@ -136,7 +136,8 @@ def rebuild(reg):
             "physicalConfigurationId":None,
             "configurationEvidenceState":"UNPROVEN",
             "provenEvidenceHashes":[],
-            "mostRecentlyImportedObservation":None
+            "mostRecentlyImportedObservation":None,
+            "latestSurveyObservation":None
         })
         if o.get("evidenceHash") and o["evidenceHash"] not in v["provenEvidenceHashes"]:
             v["provenEvidenceHashes"].append(o["evidenceHash"])
@@ -145,6 +146,7 @@ def rebuild(reg):
         candidate={
             "sourceSurveyId":o.get("sourceSurveyId"),
             "sourceSurveyOrdinal":o.get("sourceSurveyOrdinal"),
+            "surveyStartDate":survey.get("surveyStartDate"),
             "importedAt":survey.get("importedAt"),
             "probeStatus":o.get("probeStatus"),
             "physicalConfigurationStatus":o.get("physicalConfigurationStatus")
@@ -156,6 +158,14 @@ def rebuild(reg):
                  int((current or {}).get("sourceSurveyOrdinal") or 0))
         if current is None or cand_key > cur_key:
             v["mostRecentlyImportedObservation"]=candidate
+
+        latest=v.get("latestSurveyObservation")
+        cand_survey_key=(candidate.get("surveyStartDate") or "", candidate.get("sourceSurveyId") or "",
+                         int(candidate.get("sourceSurveyOrdinal") or 0))
+        latest_survey_key=((latest or {}).get("surveyStartDate") or "", (latest or {}).get("sourceSurveyId") or "",
+                           int((latest or {}).get("sourceSurveyOrdinal") or 0))
+        if latest is None or cand_survey_key > latest_survey_key:
+            v["latestSurveyObservation"]=candidate
 
     conflicts=[]
     for key,v in voyages.items():
@@ -186,7 +196,7 @@ def rebuild(reg):
         "unprovenVoyageCount":unproven,
         "currentlyUnobservableButPreviouslyProvenCount":sum(
             v["configurationEvidenceState"]=="PROVEN_TARGET_SAILING" and
-            ((v.get("mostRecentlyImportedObservation") or {}).get("physicalConfigurationStatus") or "").startswith("UNOBSERVABLE")
+            ((v.get("latestSurveyObservation") or {}).get("physicalConfigurationStatus") or "").startswith("UNOBSERVABLE")
             for v in voyages.values()
         ),
         "conflictCount":len(conflicts),

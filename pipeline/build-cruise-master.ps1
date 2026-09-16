@@ -150,11 +150,14 @@ Step "Fleet physical-configuration survey" {
   if($LASTEXITCODE -ne 0){throw "Princess fleet timeline preflight failed with exit code $LASTEXITCODE"}
 }
 
-Step "Append Celebrity evidence registry" {
-  & $Python (Join-Path $RegistryTool "fleet-configuration-registry-v1.2.py") `
-    --registry $Registry `
-    --survey (Join-Path $TimelineOut "celebrity-fleet-timeline-v1.0.json")
-  if($LASTEXITCODE -ne 0){throw "Registry updater failed with exit code $LASTEXITCODE"}
+Step "Archive + append Celebrity evidence registry" {
+  Run-Python @(
+    (Join-Path $PSScriptRoot "..\fleet\registry\archive-and-import-survey-v1.0.py"),
+    "--survey", $Timeline,
+    "--archive-dir", (Join-Path $StateDir "source-surveys\celebrity"),
+    "--registry", $Registry,
+    "--registry-tool", (Join-Path $PSScriptRoot "..\fleet\registry\fleet-configuration-registry-v1.2.py")
+  )
 }
 
 Write-Host "`nPipeline complete." -ForegroundColor Green
