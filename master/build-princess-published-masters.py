@@ -83,7 +83,7 @@ def main():
                 "firstObservedSailingDate": dates[0] if dates else None,
                 "lastObservedSailingDate": dates[-1] if dates else None,
                 "boundVoyageCount": len(evidence),
-                "path": str(final),
+                "path": final.relative_to(Path(a.state) / "static-masters").as_posix(),
                 "sha256": hashlib.sha256(final.read_bytes()).hexdigest(),
             }
         )

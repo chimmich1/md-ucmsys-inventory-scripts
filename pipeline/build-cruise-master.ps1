@@ -6,6 +6,7 @@ param(
   [string]$Python = "python",
   [string]$RegistryPath = "",
   [switch]$ReuseAcquiredVoyages,
+  [switch]$ResumeAtCelebrityMasters,
   [switch]$ResumeAtPrincessMasters,
   [switch]$SkipVoyageRefresh,
   [switch]$RestartRun
@@ -115,8 +116,11 @@ if($Mode -eq "Validate"){
 if($ResumeAtPrincessMasters -and $Mode -ne "Full"){
   throw "-ResumeAtPrincessMasters is valid only with -Mode Full"
 }
+if($ResumeAtPrincessMasters -and $ResumeAtCelebrityMasters){
+  throw "Use only one resume point at a time"
+}
 
-if(!$SkipVoyageRefresh -and !$ResumeAtPrincessMasters){
+if(!$SkipVoyageRefresh -and !$ResumeAtPrincessMasters -and !$ResumeAtCelebrityMasters){
   Push-Location $DataDir
   try {
     if($ReuseAcquiredVoyages){
@@ -150,7 +154,7 @@ if(!$SkipVoyageRefresh -and !$ResumeAtPrincessMasters){
 
 Require $Princess; Require $Celebrity
 
-if(!$ResumeAtPrincessMasters){
+if(!$ResumeAtPrincessMasters -and !$ResumeAtCelebrityMasters){
 Step "Fleet physical-configuration survey" {
   New-Item -ItemType Directory -Force -Path $TimelineOut | Out-Null
   & $Python (Join-Path $Timeline "celebrity-fleet-timeline-v1.0.py") `
@@ -179,16 +183,37 @@ Step "Archive + append Celebrity evidence registry" {
   }
 }
 
-Step "Celebrity static cabin/category masters" {
-  & $Python (Join-Path $RepoRoot "master\build-static-masters.py") --mode $Mode --voyages $Celebrity --registry $Registry --state $StateDir --data $DataDir --python $Python
-  if($LASTEXITCODE -ne 0){throw "Celebrity static-master discovery failed"}
-}
+} elseif($ResumeAtCelebrityMasters) {
+  Require $Registry
+  Require (Join-Path $StateDir "static-masters\celebrity-manifest.json")
+  Require (Join-Path $StateDir "static-masters\celebrity-catalog.json")
+  Write-Host "`n=== Resume at Celebrity masters ===" -ForegroundColor DarkCyan
+  Write-Host "Using completed canonical voyages and current configuration registry." -ForegroundColor DarkGray
 } else {
   Require $Registry
   Require (Join-Path $StateDir "static-masters\celebrity-manifest.json")
   Require (Join-Path $StateDir "static-masters\celebrity-catalog.json")
   Write-Host "`n=== Resume at Princess masters ===" -ForegroundColor DarkCyan
   Write-Host "Using completed canonical voyages and Celebrity static-master state." -ForegroundColor DarkGray
+}
+
+if(!$ResumeAtPrincessMasters){
+Step "Celebrity static cabin/category masters" {
+  # Windows PowerShell 5.1 writes a native program's stderr into its error
+  # stream. With the pipeline-wide Stop preference, the first traceback line
+  # would otherwise become a terminating PowerShell error and hide the rest of
+  # the Python traceback. Let the native process finish, preserve all stderr in
+  # the caller's transcript/Tee-Object stream, then fail from its exit code.
+  $savedErrorActionPreference=$ErrorActionPreference
+  try {
+    $ErrorActionPreference="Continue"
+    & $Python (Join-Path $RepoRoot "master\build-static-masters.py") --mode $Mode --voyages $Celebrity --registry $Registry --state $StateDir --data $DataDir --python $Python
+    $pythonExitCode=$LASTEXITCODE
+  } finally {
+    $ErrorActionPreference=$savedErrorActionPreference
+  }
+  if($pythonExitCode -ne 0){throw "Celebrity static-master discovery failed (exit code $pythonExitCode)"}
+}
 }
 
 Step "Princess published static masters" {
@@ -218,6 +243,7 @@ Step "Publish run manifest" {
     schemaVersion="1.0"; pipelineVersion=$PipelineVersion; gitSha=$gitSha;
     mode=$Mode; surveyStartDate=$SurveyStart; generatedAtUtc=(Get-Date).ToUniversalTime().ToString("o");
     resumedAtPrincessMasters=[bool]$ResumeAtPrincessMasters;
+    resumedAtCelebrityMasters=[bool]$ResumeAtCelebrityMasters;
     inputs=[ordered]@{
       princessVoyages=[ordered]@{path=$Princess;sha256=(Get-FileHash -Algorithm SHA256 $Princess).Hash.ToLowerInvariant()};
       celebrityVoyages=[ordered]@{path=$Celebrity;sha256=(Get-FileHash -Algorithm SHA256 $Celebrity).Hash.ToLowerInvariant()};

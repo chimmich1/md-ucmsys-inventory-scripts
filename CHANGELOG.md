@@ -1,5 +1,29 @@
 # Changelog
 
+## 1.0.0-rc5-hotfix2
+
+- Store Celebrity and Princess static-master catalog paths relative to `work/state/static-masters`, allowing runtime state to move between DEV and PROD locations and between Windows and Linux.
+- Accept and relocate legacy absolute-path catalog entries during validation, so existing RC5 state does not require another Full collection.
+- Normalize legacy Celebrity catalog entries on the next static-master stage and publish a relative Celebrity manifest catalog path.
+
+## 1.0.0-rc5-hotfix1
+
+- Preserve complete Python stderr/tracebacks during Celebrity static-master discovery under Windows PowerShell 5.1 instead of stopping on the first stderr line.
+- Report the native Python exit code after its complete diagnostic output has been written to the console and run log.
+
+## 1.0.0-rc5
+- Advance existing unsaturated Celebrity configuration masters during Daily
+  operation using the current master as baseline and cumulative validation as
+  tested-voyage history.
+- Preserve cumulative tested-voyage reports so saturation can span successive
+  Daily runs without replaying Full-run voyages.
+- Skip only saturated configurations or configurations with no newly proven,
+  currently published voyage evidence.
+- Stage incremental output separately and promote generated masters plus raw
+  evidence only after conflict validation succeeds.
+- Add `-ResumeAtCelebrityMasters` for guarded recovery/testing without repeating
+  acquisition, normalization, fleet survey, or registry import.
+
 ## 1.0.0-rc4
 - Replace unsafe Princess `deckPlans.do` version scraping with the voyage-specific
   `providerShipVersion` already supplied by Princess and preserved in canonical voyages.

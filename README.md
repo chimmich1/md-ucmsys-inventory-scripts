@@ -1,4 +1,4 @@
-# Universal Cruise Master Collector — 1.0.0-rc4
+# Universal Cruise Master Collector — 1.0.0-rc5
 
 Code-only collector. The repository intentionally contains **no collected cruise data**. A fresh clone bootstraps its runtime state from provider sources.
 
@@ -12,7 +12,7 @@ python -m pip install -r requirements.txt
 .\build-cruise-master.ps1 -Mode Validate
 ```
 
-`Full` starts with an empty `work/`. `Daily` reuses only locally generated state and discovers new Celebrity physical configurations as they become proven. `Validate` is read-only.
+`Full` starts with an empty `work/`. `Daily` discovers newly proven Celebrity configurations and incrementally advances existing unsaturated configurations using only newly proven, previously untested voyages. Saturated configurations are preserved without provider calls. `Validate` is read-only.
 
 Celebrity physical configurations are proven from sailing-specific room-selection JSON. Princess physical configurations are keyed by the provider ship version attached to each acquired voyage; no current-page version is projected onto unrelated sailings.
 

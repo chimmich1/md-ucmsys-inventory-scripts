@@ -32,6 +32,16 @@ The switch fails unless both canonical voyage files and the completed Celebrity
 catalog and manifest are present. It then builds Princess masters, validates all
 generated masters, and publishes the run manifest.
 
+To resume a completed acquisition/survey run specifically at incremental
+Celebrity masters, preserving canonical data and the current registry:
+
+```powershell
+.\build-cruise-master.ps1 -Mode Daily -RestartRun -ResumeAtCelebrityMasters
+```
+
+`-RestartRun` clears only that date's run checkpoints. The resume switch then
+skips acquisition, normalization, fleet survey, and registry import.
+
 ## Clean-room release acceptance
 
 ```powershell
@@ -44,4 +54,4 @@ python -m pip install -r requirements.txt
 .\build-cruise-master.ps1 -Mode Validate
 ```
 
-RC4 must not be promoted to 1.0.0 until this sequence succeeds from a virgin clone.
+RC5 must not be promoted to 1.0.0 until this sequence succeeds from a virgin clone.

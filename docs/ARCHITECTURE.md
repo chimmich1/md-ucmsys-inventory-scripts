@@ -14,3 +14,9 @@ The system separates provider acquisition, canonical voyage normalization, confi
 - Runtime provider responses and generated masters live under `work/` and are never source artifacts.
 
 Celebrity static discovery uses only the JSON room-selection API and its deck-plan layout token. Princess configuration identity comes from the ship version attached to each provider voyage. Princess deck content is retained only from non-empty structured `getDeckJSON.do` responses for that exact ship/version.
+
+During Daily operation, existing Celebrity configurations are not treated as a
+binary cache hit. Saturated masters are skipped; unsaturated masters use their
+current combined master as baseline and their cumulative validation as the
+tested-voyage exclusion set. Only newly proven, currently published voyages are
+eligible for the next bounded increment.

@@ -7,6 +7,7 @@ param(
   [string]$Python = "python",
   [string]$RegistryPath = "",
   [switch]$ReuseAcquiredVoyages,
+  [switch]$ResumeAtCelebrityMasters,
   [switch]$ResumeAtPrincessMasters,
   [switch]$SkipVoyageRefresh,
   [switch]$RestartRun
@@ -41,6 +42,10 @@ if ($ReuseAcquiredVoyages) {
 
 if ($ResumeAtPrincessMasters) {
     $params.ResumeAtPrincessMasters = $true
+}
+
+if ($ResumeAtCelebrityMasters) {
+    $params.ResumeAtCelebrityMasters = $true
 }
 
 if ($RestartRun) {

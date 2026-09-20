@@ -2,10 +2,17 @@
 import argparse,json,hashlib
 from pathlib import Path
 ap=argparse.ArgumentParser();ap.add_argument('--state',required=True);a=ap.parse_args();root=Path(a.state)/'static-masters'; mf=root/'celebrity-manifest.json'; catalog=root/'celebrity-catalog.json'
+def resolve_catalog_path(value, provider, ship, configuration, filename):
+ p=Path(value)
+ if not p.is_absolute(): return root/p
+ if p.exists(): return p
+ # Backward-compatible relocation of RC5-and-earlier catalogs containing an
+ # absolute path from the machine where the master was generated.
+ return root/provider/str(ship)/str(configuration)/filename
 if not mf.exists(): raise SystemExit('missing Celebrity static-master manifest; run Full first')
 m=json.loads(mf.read_text(encoding='utf-8')); c=json.loads(catalog.read_text(encoding='utf-8')) if catalog.exists() else {'configurations':[]}; errors=[]
 for x in c.get('configurations',[]):
- p=Path(x['path'])
+ p=resolve_catalog_path(x['path'],'celebrity',x.get('shipCode'),x.get('configurationId'),f"celebrity-ship-master-{x.get('shipCode')}-v2.2.json")
  if not p.exists(): errors.append(f'missing {p}');continue
  h=hashlib.sha256(p.read_bytes()).hexdigest()
  if h!=x['sha256']: errors.append(f'hash mismatch {p}')
@@ -17,7 +24,7 @@ if not princess_catalog.exists(): raise SystemExit('missing Princess static-mast
 pc=json.loads(princess_catalog.read_text(encoding='utf-8'))
 perrors=[]
 for x in pc.get('configurations',[]):
- p=Path(x['path'])
+ p=resolve_catalog_path(x['path'],'princess',x.get('shipCode'),x.get('configurationId'),'published-deck-plan.json')
  if not p.exists(): perrors.append(f'missing {p}');continue
  if hashlib.sha256(p.read_bytes()).hexdigest()!=x['sha256']:
   perrors.append(f'hash mismatch {p}');continue

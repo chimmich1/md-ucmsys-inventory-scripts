@@ -763,6 +763,8 @@ def main():
     voyages = flatten_voyages(load_json(args.voyages))
     baseline = load_json(args.baseline_master)
     excluded = load_excluded_voyages(args.previous_validation)
+    previous_validation = load_json(args.previous_validation) if args.previous_validation else {}
+    previous_voyage_reports = list(previous_validation.get("voyages") or [])
     included = {x for x in args.include_voyage_ids.split(",") if x}
     if included:
         voyages = [v for v in voyages if str(voyage_id(v)) in included]
@@ -819,7 +821,11 @@ def main():
     except Exception:
         pass
 
-    voyage_reports = []
+    # Preserve the complete tested-voyage history across Daily increments. This
+    # prevents a later Daily run from retesting Full-run voyages and allows the
+    # no-change saturation tail to span consecutive runs.
+    voyage_reports = list(previous_voyage_reports)
+    current_voyage_reports = []
 
     print("Celebrity JSON-only configuration crawler v2.3")
     print(f"  Ship:                    {args.ship}")
@@ -832,7 +838,8 @@ def main():
 
     for index, v in enumerate(candidates, 1):
         ctx = voyage_context(v, args.country, args.currency, args.adults, args.children)
-        vdir = raw_root / f"{index:02d}-{ctx['sailDate']}-{safe_name(ctx['voyageId'])}"
+        history_index = len(previous_voyage_reports) + index
+        vdir = raw_root / f"{history_index:02d}-{ctx['sailDate']}-{safe_name(ctx['voyageId'])}"
         vdir.mkdir(parents=True, exist_ok=True)
 
         before_target_assignments = {
@@ -1043,6 +1050,7 @@ def main():
             "queriedDecks": queried_decks,
         }
         voyage_reports.append(report)
+        current_voyage_reports.append(report)
         dump_json(vdir / "voyage-report.json", report)
 
         print(
@@ -1184,6 +1192,7 @@ def main():
             "targetConfiguration": args.target_configuration,
             "excludedPreviouslyTestedVoyageCount": len(excluded),
             "candidateVoyageCount": len(candidates),
+            "currentRunTestedVoyageCount": len(current_voyage_reports),
             "testedVoyageCount": len(voyage_reports),
             "eligibleTargetVoyageCount": len(eligible),
             "tailLength": len(tail),
@@ -1221,7 +1230,8 @@ def main():
         "configurations": configurations,
         "cabinDeckConflictCount": len(conflicts),
         "cabinDeckConflicts": conflicts,
-        "failureCount": sum(r["failureCount"] for r in voyage_reports),
+        "failureCount": sum(r.get("failureCount", 0) for r in voyage_reports),
+        "currentRunFailureCount": sum(r.get("failureCount", 0) for r in current_voyage_reports),
         "voyages": voyage_reports,
         "saturation": master["saturation"],
     }
