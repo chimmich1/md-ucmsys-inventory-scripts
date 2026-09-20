@@ -20,3 +20,12 @@ binary cache hit. Saturated masters are skipped; unsaturated masters use their
 current combined master as baseline and their cumulative validation as the
 tested-voyage exclusion set. Only newly proven, currently published voyages are
 eligible for the next bounded increment.
+
+Catalogs use paths relative to `state/static-masters`. Legacy absolute paths are
+mapped to local provider/ship/configuration files; validation never follows an old
+workspace. Celebrity catalog metadata is reconciled from all published master and
+validation pairs before Daily collection and after each completed configuration.
+Atomic catalog replacement plus restart reconciliation closes the completed
+promotion/catalog-publication gap. Validate stays read-only; offline metadata
+repair is a separate command. Multi-file master promotion is not a single atomic
+transaction, and inconsistent published pairs must be investigated.

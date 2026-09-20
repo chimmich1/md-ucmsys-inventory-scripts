@@ -6,6 +6,7 @@ import subprocess
 import sys
 from collections import defaultdict
 from pathlib import Path
+from catalog_state import dump
 
 
 def voyage_version(voyage):
@@ -88,16 +89,13 @@ def main():
             }
         )
 
-    (base / "catalog.json").write_text(
-        json.dumps(
-            {
-                "schemaVersion": "1.1",
-                "scope": "provider-voyage-bound Princess ship configurations",
-                "configurations": catalog,
-            },
-            indent=2,
-        ),
-        encoding="utf-8",
+    dump(
+        base / "catalog.json",
+        {
+            "schemaVersion": "1.1",
+            "scope": "provider-voyage-bound Princess ship configurations",
+            "configurations": catalog,
+        },
     )
     print(
         json.dumps(

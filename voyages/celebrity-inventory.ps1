@@ -7,7 +7,5 @@ $ErrorActionPreference = "Stop"
 $script = Join-Path $PSScriptRoot "celebrity-inventory.py"
 if (!(Test-Path $script)) { throw "Missing Celebrity acquisition script: $script" }
 
-& $Python $script --out $Out
-if ($LASTEXITCODE -ne 0) {
-  throw "Celebrity Python acquisition failed (exit code $LASTEXITCODE)"
-}
+. (Join-Path $PSScriptRoot "..\pipeline\invoke-native.ps1")
+Invoke-NativeCommand -Executable $Python -Arguments @($script, "--out", $Out)

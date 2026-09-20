@@ -7,16 +7,11 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
+from catalog_state import dump, reconcile_celebrity
 
 
 def load(path):
     return json.loads(Path(path).read_text(encoding="utf-8-sig"))
-
-
-def dump(path, obj):
-    path = Path(path)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(obj, indent=2, ensure_ascii=False), encoding="utf-8")
 
 
 def sha(path):
@@ -116,6 +111,32 @@ def main():
     configurations = proven_configs(load(args.registry))
     available_voyages = canonical_voyage_ids(args.voyages)
 
+    catalog_path = static_root / "celebrity-catalog.json"
+    catalog = load(catalog_path) if catalog_path.exists() else {"configurations": []}
+    existing = {(item["shipCode"], str(item["configurationId"])): item
+                for item in catalog.get("configurations", [])}
+
+    def publish_catalog():
+        recovered = reconcile_celebrity(static_root, {
+            **catalog, "configurations": [existing[key] for key in sorted(existing)]})
+        dump(catalog_path, recovered)
+        existing.update({(item["shipCode"], str(item["configurationId"])): item
+                         for item in recovered["configurations"]})
+
+    if args.mode == "Daily":
+        # Include completed configurations whose initial catalog publication was
+        # interrupted, as well as every old entry (even absent from the registry).
+        for ship, configuration in configurations:
+            directory = masters / ship / configuration
+            final = directory / f"celebrity-ship-master-{ship}-v2.2.json"
+            validation = directory / f"celebrity-ship-master-validation-{ship}-v2.2.json"
+            if final.exists() or validation.exists():
+                existing.setdefault((ship, configuration), {
+                    "shipCode": ship, "configurationId": configuration})
+        # Recover before another provider call can fail. Missing/conflicting
+        # published artifacts fail closed rather than being silently rebuilt.
+        publish_catalog()
+
     built = []
     advanced = []
     skipped_saturated = []
@@ -194,31 +215,15 @@ def main():
         else:
             built.append(catalog_entry(ship, configuration, final, staged_validation, static_root))
 
+        existing[(ship, configuration)] = catalog_entry(
+            ship, configuration, final, staged_validation, static_root)
+        publish_catalog()
+
     staging_root = masters / ".daily-staging"
     if staging_root.exists():
         shutil.rmtree(staging_root)
 
-    catalog_path = state / "static-masters" / "celebrity-catalog.json"
-    existing = {}
-    if catalog_path.exists():
-        for item in load(catalog_path).get("configurations", []):
-            # Normalize catalogs produced by RC5 and earlier. Those releases
-            # embedded the build machine's absolute path, which made otherwise
-            # valid state impossible to relocate to DEV/PROD.
-            ship = item.get("shipCode")
-            configuration = str(item.get("configurationId"))
-            if ship and configuration:
-                expected = masters / ship / configuration / f"celebrity-ship-master-{ship}-v2.2.json"
-                item["path"] = relative_catalog_path(expected, static_root)
-            existing[(item.get("shipCode"), str(item.get("configurationId")))] = item
-    for item in built + advanced:
-        existing[(item["shipCode"], str(item["configurationId"]))] = item
-    catalog = {
-        "schemaVersion": "1.1",
-        "provider": "CELEBRITY",
-        "configurations": [existing[key] for key in sorted(existing)],
-    }
-    dump(catalog_path, catalog)
+    publish_catalog()
 
     manifest = {
         "schemaVersion": "1.1",

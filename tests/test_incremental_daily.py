@@ -6,6 +6,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "master"))
 SCRIPT = ROOT / "master/build-static-masters.py"
 COLLECTOR = ROOT / "master/providers/celebrity/configuration-discovery.py"
 ROOT_PIPELINE = ROOT / "build-cruise-master.ps1"
@@ -110,6 +111,8 @@ def test_daily_advances_only_unsaturated_configuration_with_new_voyage():
         assert manifest["catalogPath"] == "celebrity-catalog.json"
         catalog = json.loads((state / "static-masters/celebrity-catalog.json").read_text())
         assert all(not Path(item["path"]).is_absolute() for item in catalog["configurations"])
+        for item in catalog["configurations"]:
+            assert item["sha256"] == module.sha(state / "static-masters" / item["path"])
         assert {item["path"] for item in catalog["configurations"]} == {
             "celebrity/AA/1/celebrity-ship-master-AA-v2.2.json",
             "celebrity/BB/2/celebrity-ship-master-BB-v2.2.json",

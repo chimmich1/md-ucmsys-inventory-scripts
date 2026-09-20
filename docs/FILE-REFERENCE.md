@@ -13,13 +13,16 @@
 | `fleet/timeline/princess-fleet-timeline-preflight-v1.0.py` | Builds Princess configuration eras from provider versions attached to canonical voyages. | `work/state` |
 | `fleet/registry/archive-and-import-survey-v1.0.py` | Content-addresses survey and appends Registry V1.2. | `work/state` |
 | `fleet/registry/fleet-configuration-registry-v1.2.py` | Durable evidence registry. | `work/state` |
-| `master/build-static-masters.py` | Discovers only missing Celebrity ship/config masters. | `work/state/static-masters` |
+| `master/build-static-masters.py` | Builds missing Celebrity masters, advances unsaturated configurations, and reconciles all catalog entries. | `work/state/static-masters` |
+| `master/catalog_state.py` | Local catalog path resolution, atomic JSON publishing, and metadata reconciliation. | Caller-selected catalogs |
+| `master/reconcile-catalogs.py` | Offline catalog recovery and relocation without collection. | Two catalogs and Celebrity manifest only |
+| `pipeline/invoke-native.ps1` | Preserves complete native stderr before checking exit codes. | No |
 | `master/providers/celebrity/configuration-discovery.py` | Configuration-aware Celebrity cabin/category saturation collector. | Caller-selected runtime directory |
 | `master/build-princess-published-masters.py` | Enumerates voyage-bound Princess ship/version configurations. | `work/state/static-masters` |
 | `master/providers/princess/published-deck-collector.py` | Collects provider-confirmed Princess deck JSON for one exact ship/version. | Caller-selected runtime file |
 | `master/validate-masters.py` | Hash/integrity validation; no writes. | No |
 | `master/universal/*.py` | Universal Cabin Model adapters retained for provider-neutral transformation work. | Caller-selected output |
 | `diagnostics/legacy/*` | Diagnostics only; never Full/Daily. | Not by pipeline |
-| `tests/*` | Deterministic registry regression tests; production snapshots must not be fixtures. | Temporary test dirs only |
+| `tests/*` | Deterministic registry, provider, catalog recovery/relocation, and Windows stderr regressions; production snapshots must not be fixtures. | Temporary test dirs only |
 | `requirements.txt` | Python runtime dependencies. | No |
 | `VERSION` | Pipeline/release version. | No |
