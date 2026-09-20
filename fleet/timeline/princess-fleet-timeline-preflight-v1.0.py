@@ -1,103 +1,120 @@
 #!/usr/bin/env python3
-"""
-Princess fleet configuration timeline PRE-FLIGHT v1.0.
-
-Important design constraint:
-The public deckPlans.do page exposes a ship/version signal, but our current evidence
-does NOT establish that querying the page today yields the layout version applicable
-to an arbitrary future voyage. Therefore this script deliberately does NOT assign that
-version to every future sailing.
-
-It performs the safe pieces now:
-- future-only voyage enumeration
-- ship inventory
-- current public deck-plan version discovery per ship
-- category hierarchy signature for that discovered version across its decks, when possible
-- emits unresolved voyage->configuration bindings rather than inventing them
-
-The resulting artifact tells us exactly which missing provider contract must be discovered
-before Princess sailing-era boundaries can be asserted.
-"""
-from pathlib import Path
+"""Build the Princess ship/version timeline from provider voyage bindings."""
 from datetime import date
-import argparse,json,re,requests,urllib.parse,xml.etree.ElementTree as ET
+import argparse
+
 from timeline_common import *
 
-BASE="https://www.princess.com"
-PAGE=BASE+"/deckPlans.do"
 
-def ship_code(v):
-    value=first(v,"shipCode","ship","providerShipCode",default="")
-    if isinstance(value,dict):
-        value=first(value,"providerId","shipCode","code","id",default="")
+def ship_code(voyage):
+    value = first(voyage, "shipCode", "ship", "providerShipCode", default="")
+    if isinstance(value, dict):
+        value = first(value, "providerId", "shipCode", "code", "id", default="")
     return str(value or "")
 
-def voyage_id(v):
-    return str(first(v,"providerId","voyageId","id",default=""))
 
-def page_version(html):
-    pats=[r'filter\.version\s*=\s*["\']?(\d+)',r'version["\']?\s*[:=]\s*["\']?(\d+)']
-    for p in pats:
-        m=re.search(p,html,re.I)
-        if m: return m.group(1)
-    return None
+def voyage_id(voyage):
+    return str(first(voyage, "providerId", "voyageId", "id", default=""))
 
-def deck_candidates(html):
-    vals=set(re.findall(r'(?:deck|deckNumber)["\']?\s*[:=]\s*["\']?([0-9]{1,2})',html,re.I))
-    # conservative standard deck range fallback is NOT used; unknown remains unknown
-    return sorted(vals,key=lambda x:int(x))
 
-def category_entries(session,ship,version,decks):
-    entries=[]
-    for deck in decks:
-        u=BASE+"/getCategories.do"
-        r=session.get(u,params={"shipCode":ship,"version":version,"deck":deck},timeout=30)
-        if not r.ok: continue
-        try: obj=r.json()
-        except: continue
-        candidates=obj if isinstance(obj,list) else obj.get("categories",[]) if isinstance(obj,dict) else []
-        for c in candidates:
-            if not isinstance(c,dict): continue
-            entries.append({"typeCode":str(first(c,"metaCode",default="") or ""),
-                            "subtypeCode":str(first(c,"subMetaCode",default="") or ""),
-                            "categoryCode":str(first(c,"categoryCode","code",default="") or "")})
-    return entries
+def provider_ship_version(voyage):
+    source = voyage.get("source") if isinstance(voyage.get("source"), dict) else {}
+    value = first(source, "providerShipVersion", default=None)
+    return None if value is None else str(value)
+
 
 def main():
-    ap=argparse.ArgumentParser()
-    ap.add_argument("--voyages",required=True); ap.add_argument("--out",required=True)
-    ap.add_argument("--survey-start",default=str(date.today()))
-    a=ap.parse_args(); start=parse_date(a.survey_start)
-    obj=load_json(a.voyages); voyages=obj if isinstance(obj,list) else first(obj,"voyages","items",default=[])
-    fv=future_voyages(voyages,start)
-    ships=sorted(set(ship_code(v) for v in fv if ship_code(v)))
-    ses=requests.Session()
-    ship_inventory={}
-    for ship in ships:
-        rec={"shipCode":ship,"status":"FAILURE"}
-        try:
-            r=ses.get(PAGE,params={"shipCode":ship},timeout=30); r.raise_for_status()
-            ver=page_version(r.text); decks=deck_candidates(r.text)
-            entries=category_entries(ses,ship,ver,decks) if ver and decks else []
-            rec={"shipCode":ship,"status":"SUCCESS","currentlyPublishedDeckPlanVersion":ver,
-                 "deckCandidatesFromPage":decks,
-                 "commercialHierarchySignatureForPublishedVersion":build_signature(entries) if entries else None,
-                 "warning":"Current published deck-plan version is NOT assigned to arbitrary future voyages."}
-        except Exception as e:
-            rec["error"]=repr(e)
-        ship_inventory[ship]=rec
-        print(ship,rec["status"],rec.get("currentlyPublishedDeckPlanVersion"))
-    observations=[]
-    for v in fv:
-        observations.append({"provider":"PRINCESS","voyageId":voyage_id(v),"shipCode":ship_code(v),
-          "sailDate":sailing_date(v),"status":"UNRESOLVED",
-          "physicalConfigurationId":None,"commercialHierarchySignature":None,
-          "reason":"Voyage-specific Princess deck-plan version binding not yet proven."})
-    result={"schemaVersion":"1.0","provider":"PRINCESS","surveyStartDate":str(start),
-      "eligibilityRule":"sailDate > surveyStartDate","shipPublishedVersionInventory":ship_inventory,
-      "observations":observations,"observedEras":[],"transitions":[],
-      "notes":["Fail-closed by design: current ship deck-plan version is not projected onto future voyages.",
-               "Next Princess discovery target is the voyage-specific binding between sailing and deck-plan version."]}
-    dump_json(a.out,result)
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--voyages", required=True)
+    ap.add_argument("--out", required=True)
+    ap.add_argument("--survey-start", default=str(date.today()))
+    a = ap.parse_args()
 
-if __name__=="__main__": main()
+    obj = load_json(a.voyages)
+    voyages = obj if isinstance(obj, list) else first(obj, "voyages", "items", default=[])
+    start = parse_date(a.survey_start)
+    eligible = future_voyages(voyages, start)
+    observations = []
+    inventory = {}
+    missing = []
+
+    for voyage in eligible:
+        ship = ship_code(voyage)
+        version = provider_ship_version(voyage)
+        record = {
+            "provider": "PRINCESS",
+            "voyageId": voyage_id(voyage),
+            "shipCode": ship,
+            "sailDate": sailing_date(voyage),
+        }
+        if not ship or version is None or version == "":
+            record.update({
+                "status": "UNRESOLVED_MISSING_PROVIDER_SHIP_VERSION",
+                "physicalConfigurationId": None,
+                "reason": "Canonical voyage has no Princess providerShipVersion.",
+            })
+            missing.append(record["voyageId"])
+        else:
+            record.update({
+                "status": "SUCCESS",
+                "physicalConfigurationId": version,
+                "physicalConfigurationEvidence": {
+                    "source": "canonical voyage source.providerShipVersion",
+                    "providerSupplied": True,
+                },
+                "commercialHierarchySignature": None,
+            })
+            entry = inventory.setdefault(ship, {"shipCode": ship, "versions": {}})
+            version_entry = entry["versions"].setdefault(version, {
+                "physicalConfigurationId": version,
+                "firstObservedSailingDate": record["sailDate"],
+                "lastObservedSailingDate": record["sailDate"],
+                "observedVoyageCount": 0,
+            })
+            version_entry["firstObservedSailingDate"] = min(
+                version_entry["firstObservedSailingDate"], record["sailDate"]
+            )
+            version_entry["lastObservedSailingDate"] = max(
+                version_entry["lastObservedSailingDate"], record["sailDate"]
+            )
+            version_entry["observedVoyageCount"] += 1
+        observations.append(record)
+
+    if missing:
+        raise SystemExit(
+            "Princess timeline has voyages without providerShipVersion: "
+            + ", ".join(missing[:10])
+        )
+
+    serializable_inventory = {}
+    for ship, entry in sorted(inventory.items()):
+        serializable_inventory[ship] = {
+            "shipCode": ship,
+            "versions": [entry["versions"][key] for key in sorted(entry["versions"])],
+        }
+    result = {
+        "schemaVersion": "1.1",
+        "provider": "PRINCESS",
+        "surveyStartDate": str(start),
+        "eligibilityRule": "sailDate > surveyStartDate",
+        "configurationEvidenceSource": "canonical voyage source.providerShipVersion",
+        "shipVersionInventory": serializable_inventory,
+        "observations": observations,
+        "observedEras": observed_eras(observations),
+        "transitions": transition_records(observations),
+        "notes": [
+            "Princess ship/version identity is supplied on each acquired voyage.",
+            "No deckPlans.do page scraping or version projection is used.",
+            "Observed bounds are not asserted effective dates beyond the published voyages.",
+        ],
+    }
+    dump_json(a.out, result)
+    print(
+        f"Princess voyage-bound configurations: "
+        f"{sum(len(x['versions']) for x in serializable_inventory.values())} "
+        f"across {len(serializable_inventory)} ships"
+    )
+
+
+if __name__ == "__main__":
+    main()

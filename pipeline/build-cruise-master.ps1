@@ -1,10 +1,12 @@
-﻿param(
+param(
   [ValidateSet("Full","Daily","Validate")][string]$Mode = "Daily",
   [string]$DataDir = "",
   [string]$StateDir = "",
   [string]$SurveyStart = (Get-Date -Format "yyyy-MM-dd"),
   [string]$Python = "python",
   [string]$RegistryPath = "",
+  [switch]$ReuseAcquiredVoyages,
+  [switch]$ResumeAtPrincessMasters,
   [switch]$SkipVoyageRefresh,
   [switch]$RestartRun
 )
@@ -13,7 +15,7 @@ $PipelineDir=Split-Path -Parent $MyInvocation.MyCommand.Path
 $RepoRoot=Split-Path -Parent $PipelineDir
 if(!$DataDir){$DataDir=Join-Path $RepoRoot "work\data"}
 if(!$StateDir){$StateDir=Join-Path $RepoRoot "work\state"}
-New-Item -ItemType Directory -Force -Path $DataDir,$StateDir | Out-Null
+if($Mode -ne "Validate"){ New-Item -ItemType Directory -Force -Path $DataDir,$StateDir | Out-Null }
 $Voy=Join-Path $RepoRoot "voyages"
 $Timeline=Join-Path $RepoRoot "fleet\timeline"
 $RegistryTool=Join-Path $RepoRoot "fleet\registry"
@@ -22,18 +24,16 @@ if($RegistryPath){
   $Registry=$RegistryPath
 } else {
   $Registry=Join-Path $StateDir "fleet-physical-configuration-registry-v1.2.json"
-  # Convenience migration path for the validated standalone V1.1 registry.
-  $LegacyRegistry=Join-Path $DataDir "fleet-configuration-registry-v1.1\fleet-physical-configuration-registry-v1.2.json"
-  if(!(Test-Path $Registry) -and (Test-Path $LegacyRegistry)){
-    $Registry=$LegacyRegistry
-  }
 }
-
-$PipelineVersion="0.4.0"
+$VersionFile=Join-Path $RepoRoot "VERSION"
+if(!(Test-Path $VersionFile)){throw "Missing VERSION file: $VersionFile"}
+$PipelineVersion=(Get-Content -Raw $VersionFile).Trim()
 $RunKey="$SurveyStart-$($Mode.ToLowerInvariant())-v$PipelineVersion"
 $RunDir=Join-Path $StateDir "runs\$RunKey"
-if($RestartRun -and (Test-Path $RunDir)){Remove-Item -Recurse -Force $RunDir}
-New-Item -ItemType Directory -Force -Path $RunDir | Out-Null
+if($Mode -ne "Validate"){
+  if($RestartRun -and (Test-Path $RunDir)){Remove-Item -Recurse -Force $RunDir}
+  New-Item -ItemType Directory -Force -Path $RunDir | Out-Null
+}
 
 function StageKey([string]$Name){
   return (($Name.ToLowerInvariant() -replace '[^a-z0-9]+','-').Trim('-'))
@@ -96,31 +96,43 @@ $Princess=Join-Path $DataDir "cruise-voyages-princess-v3.1.json"
 $Celebrity=Join-Path $DataDir "cruise-voyages-celebrity-v3.1.json"
 
 if($Mode -eq "Validate"){
-  Step "Validate canonical inputs" -Always {
-    Require $Princess; Require $Celebrity
-    $p=Get-Content -Raw $Princess | ConvertFrom-Json
-    $c=Get-Content -Raw $Celebrity | ConvertFrom-Json
-    Write-Host "Princess voyages: $(@($p.voyages).Count)"
-    Write-Host "Celebrity voyages: $(@($c.voyages).Count)"
-  }
-  Step "Validate registry" -Always {
-    Require $Registry
-    $r=Get-Content -Raw $Registry | ConvertFrom-Json
-    Write-Host "Registry version: $($r.version)"
-    if($r.version -ne "1.2"){throw "Expected Registry V1.2; found $($r.version)"}
-    Write-Host "Observations: $(@($r.observations).Count)"
-    Write-Host "Voyages: $(@($r.voyages.PSObject.Properties).Count)"
-    Write-Host "Conflicts: $(@($r.conflicts).Count)"
-    if(@($r.conflicts).Count -gt 0){throw "Registry contains physical-configuration conflicts"}
-  }
+  # Validate is deliberately read-only: no run directory, checkpoints or generated files.
+  Require $Princess; Require $Celebrity; Require $Registry
+  $p=Get-Content -Raw $Princess | ConvertFrom-Json
+  $c=Get-Content -Raw $Celebrity | ConvertFrom-Json
+  $r=Get-Content -Raw $Registry | ConvertFrom-Json
+  Write-Host "Princess voyages: $(@($p.voyages).Count)"
+  Write-Host "Celebrity voyages: $(@($c.voyages).Count)"
+  if($r.version -ne "1.2"){throw "Expected Registry V1.2; found $($r.version)"}
+  if(@($r.conflicts).Count -gt 0){throw "Registry contains physical-configuration conflicts"}
+  & $Python (Join-Path $RepoRoot "master\validate-masters.py") --state $StateDir
+  if($LASTEXITCODE -ne 0){throw "Static-master validation failed"}
+  Write-Host "Validation complete (read-only)." -ForegroundColor Green
   exit 0
 }
 
-if(!$SkipVoyageRefresh){
+
+if($ResumeAtPrincessMasters -and $Mode -ne "Full"){
+  throw "-ResumeAtPrincessMasters is valid only with -Mode Full"
+}
+
+if(!$SkipVoyageRefresh -and !$ResumeAtPrincessMasters){
   Push-Location $DataDir
   try {
-    Step "Princess voyage acquisition" { Invoke-ChildPowerShellScript -ScriptPath (Join-Path $Voy "princess-inventory.ps1") }
-    Step "Celebrity voyage acquisition" { Invoke-ChildPowerShellScript -ScriptPath (Join-Path $Voy "celebrity-inventory.ps1") }
+    if($ReuseAcquiredVoyages){
+      Require (Join-Path $DataDir "princess-products.json")
+      Require (Join-Path $DataDir "princess-ports.json")
+      Require (Join-Path $DataDir "princess-ships.json")
+      Require (Join-Path $DataDir "princess-itineraries.json")
+      Require (Join-Path $DataDir "celebrity-voyages-raw.json")
+      Write-Host "`n=== Voyage acquisition ===" -ForegroundColor DarkCyan
+      Write-Host "Using previously acquired provider artifacts." -ForegroundColor DarkGray
+    } else {
+      Step "Princess voyage acquisition" { Invoke-ChildPowerShellScript -ScriptPath (Join-Path $Voy "princess-inventory.ps1") }
+      Step "Celebrity voyage acquisition" {
+        Invoke-ChildPowerShellScript -ScriptPath (Join-Path $Voy "celebrity-inventory.ps1") -Arguments @("-Python",$Python)
+      }
+    }
 
     # v0.3: sailing-specific itinerary data is returned in the same GraphQL
     # acquisition above. No itinerary-page/RSC crawl is part of Full or Daily.
@@ -138,6 +150,7 @@ if(!$SkipVoyageRefresh){
 
 Require $Princess; Require $Celebrity
 
+if(!$ResumeAtPrincessMasters){
 Step "Fleet physical-configuration survey" {
   New-Item -ItemType Directory -Force -Path $TimelineOut | Out-Null
   & $Python (Join-Path $Timeline "celebrity-fleet-timeline-v1.0.py") `
@@ -166,11 +179,59 @@ Step "Archive + append Celebrity evidence registry" {
   }
 }
 
+Step "Celebrity static cabin/category masters" {
+  & $Python (Join-Path $RepoRoot "master\build-static-masters.py") --mode $Mode --voyages $Celebrity --registry $Registry --state $StateDir --data $DataDir --python $Python
+  if($LASTEXITCODE -ne 0){throw "Celebrity static-master discovery failed"}
+}
+} else {
+  Require $Registry
+  Require (Join-Path $StateDir "static-masters\celebrity-manifest.json")
+  Require (Join-Path $StateDir "static-masters\celebrity-catalog.json")
+  Write-Host "`n=== Resume at Princess masters ===" -ForegroundColor DarkCyan
+  Write-Host "Using completed canonical voyages and Celebrity static-master state." -ForegroundColor DarkGray
+}
+
+Step "Princess published static masters" {
+  & $Python (Join-Path $RepoRoot "master\build-princess-published-masters.py") --mode $Mode --voyages $Princess --state $StateDir --python $Python
+  if($LASTEXITCODE -ne 0){throw "Princess published static-master discovery failed"}
+}
+
+Step "Validate generated masters" {
+  & $Python (Join-Path $RepoRoot "master\validate-masters.py") --state $StateDir
+  if($LASTEXITCODE -ne 0){throw "Generated master validation failed"}
+}
+
+
+Step "Publish run manifest" {
+  # Release ZIPs intentionally contain no .git directory. Git provenance is
+  # optional metadata and must not make an otherwise valid clean-room run fail.
+  $gitSha="UNKNOWN"
+  if(Test-Path (Join-Path $RepoRoot ".git")){
+    try {
+      $candidate = (& git -C $RepoRoot rev-parse HEAD 2>$null | Select-Object -First 1)
+      if($LASTEXITCODE -eq 0 -and $candidate){$gitSha=$candidate}
+    } catch {
+      $gitSha="UNKNOWN"
+    }
+  }
+  $manifest=[ordered]@{
+    schemaVersion="1.0"; pipelineVersion=$PipelineVersion; gitSha=$gitSha;
+    mode=$Mode; surveyStartDate=$SurveyStart; generatedAtUtc=(Get-Date).ToUniversalTime().ToString("o");
+    resumedAtPrincessMasters=[bool]$ResumeAtPrincessMasters;
+    inputs=[ordered]@{
+      princessVoyages=[ordered]@{path=$Princess;sha256=(Get-FileHash -Algorithm SHA256 $Princess).Hash.ToLowerInvariant()};
+      celebrityVoyages=[ordered]@{path=$Celebrity;sha256=(Get-FileHash -Algorithm SHA256 $Celebrity).Hash.ToLowerInvariant()};
+      registry=[ordered]@{path=$Registry;sha256=(Get-FileHash -Algorithm SHA256 $Registry).Hash.ToLowerInvariant()}
+    }
+  }
+  $manifest | ConvertTo-Json -Depth 8 | Set-Content -Encoding UTF8 (Join-Path $RunDir "run-manifest.json")
+}
+
+
 Write-Host "`nPipeline complete." -ForegroundColor Green
 Write-Host "Mode:      $Mode"
 Write-Host "State:     $StateDir"
 Write-Host "Registry:  $Registry"
 Write-Host "Run state: $RunDir"
 Write-Host ""
-Write-Host "NOTE: cabin-master/category-master discovery is intentionally NOT yet auto-invoked."
-Write-Host "The existing Celebrity saturation crawler is not yet a fleet-generic, configuration-keyed production stage."
+Write-Host "Static masters: $(Join-Path $StateDir 'static-masters')"

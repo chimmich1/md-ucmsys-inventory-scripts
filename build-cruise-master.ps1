@@ -6,6 +6,8 @@ param(
   [string]$SurveyStart = (Get-Date -Format "yyyy-MM-dd"),
   [string]$Python = "python",
   [string]$RegistryPath = "",
+  [switch]$ReuseAcquiredVoyages,
+  [switch]$ResumeAtPrincessMasters,
   [switch]$SkipVoyageRefresh,
   [switch]$RestartRun
 )
@@ -31,6 +33,14 @@ if ($RegistryPath) {
 
 if ($SkipVoyageRefresh) {
     $params.SkipVoyageRefresh = $true
+}
+
+if ($ReuseAcquiredVoyages) {
+    $params.ReuseAcquiredVoyages = $true
+}
+
+if ($ResumeAtPrincessMasters) {
+    $params.ResumeAtPrincessMasters = $true
 }
 
 if ($RestartRun) {

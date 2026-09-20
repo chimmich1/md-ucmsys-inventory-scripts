@@ -1,0 +1,25 @@
+# File reference
+
+| Path | Purpose | Runtime writes? |
+|---|---|---|
+| `build-cruise-master.ps1` | Stable root entry point; forwards parameters to pipeline. | No |
+| `pipeline/build-cruise-master.ps1` | Full/Daily orchestration and read-only Validate entry. | Full/Daily only |
+| `voyages/princess-inventory.ps1` | Princess voyage acquisition. | `work/data` |
+| `voyages/celebrity-inventory.ps1` | Celebrity GraphQL voyage acquisition. | `work/data` |
+| `voyages/celebrity-inventory.py` | Fresh browser-impersonated, paginated Celebrity transport with atomic validated publishing. | `work/data` |
+| `voyages/build-celebrity-port-country.ps1` | Celebrity port/country enrichment. | `work/data` |
+| `voyages/cruise-voyage-normalizer-v3.1.ps1` | Provider-to-canonical voyage normalization. | `work/data` |
+| `fleet/timeline/celebrity-fleet-timeline-v1.0.py` | Future target-sailing physical configuration survey. | `work/state` |
+| `fleet/timeline/princess-fleet-timeline-preflight-v1.0.py` | Builds Princess configuration eras from provider versions attached to canonical voyages. | `work/state` |
+| `fleet/registry/archive-and-import-survey-v1.0.py` | Content-addresses survey and appends Registry V1.2. | `work/state` |
+| `fleet/registry/fleet-configuration-registry-v1.2.py` | Durable evidence registry. | `work/state` |
+| `master/build-static-masters.py` | Discovers only missing Celebrity ship/config masters. | `work/state/static-masters` |
+| `master/providers/celebrity/configuration-discovery.py` | Configuration-aware Celebrity cabin/category saturation collector. | Caller-selected runtime directory |
+| `master/build-princess-published-masters.py` | Enumerates voyage-bound Princess ship/version configurations. | `work/state/static-masters` |
+| `master/providers/princess/published-deck-collector.py` | Collects provider-confirmed Princess deck JSON for one exact ship/version. | Caller-selected runtime file |
+| `master/validate-masters.py` | Hash/integrity validation; no writes. | No |
+| `master/universal/*.py` | Universal Cabin Model adapters retained for provider-neutral transformation work. | Caller-selected output |
+| `diagnostics/legacy/*` | Diagnostics only; never Full/Daily. | Not by pipeline |
+| `tests/*` | Deterministic registry regression tests; production snapshots must not be fixtures. | Temporary test dirs only |
+| `requirements.txt` | Python runtime dependencies. | No |
+| `VERSION` | Pipeline/release version. | No |

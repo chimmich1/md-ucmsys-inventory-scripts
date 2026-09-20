@@ -36,6 +36,66 @@ function T($s) {
   try { return ([datetime]::Parse($v)).ToString("HH:mm:ss") } catch { return $v }
 }
 
+function Test-PrincessOvernightScenicContinuation($scenic, $continuation) {
+  if (!$scenic -or !$continuation) { return $false }
+
+  $isAfterMidnight =
+    ([string]$scenic.resFlag2 -eq "AM") -or
+    ([string]$scenic.resDesc2 -eq "DEPARTS AFTER MIDNIGHT") -or
+    ([string]$scenic.resFlag1 -eq "ON") -or
+    ([string]$scenic.resDesc1 -eq "OVERNIGHT")
+  if (!$isAfterMidnight) { return $false }
+
+  # Princess splits some scenic calls across midnight. The second row carries
+  # only the next-day departure and a sequential provider row ID.
+  if ($continuation.arrivalTime -or !$continuation.departTime) { return $false }
+  $continuationHasOnlyScenicMetadata =
+    (!$continuation.resFlag1 -or ([string]$continuation.resFlag1 -eq "SE")) -and
+    (!$continuation.resDesc1 -or ([string]$continuation.resDesc1 -eq "SCENIC CRUISING")) -and
+    (!$continuation.resFlag2 -or ([string]$continuation.resFlag2 -eq "SE")) -and
+    (!$continuation.resDesc2 -or ([string]$continuation.resDesc2 -eq "SCENIC CRUISING"))
+  if (!$continuationHasOnlyScenicMetadata) { return $false }
+
+  $scenicDate = D $scenic.arrivalDt
+  $continuationDate = D $continuation.arrivalDt
+  if (!$scenicDate -or !$continuationDate) { return $false }
+  if (([datetime]$continuationDate) -ne ([datetime]$scenicDate).AddDays(1)) { return $false }
+
+  $scenicId = [regex]::Match([string]$scenic.id, '^(.*?)(\d+)$')
+  $continuationId = [regex]::Match([string]$continuation.id, '^(.*?)(\d+)$')
+  if (!$scenicId.Success -or !$continuationId.Success) { return $false }
+  if ($scenicId.Groups[1].Value -ne $continuationId.Groups[1].Value) { return $false }
+
+  return ([int64]$continuationId.Groups[2].Value -eq ([int64]$scenicId.Groups[2].Value + 1))
+}
+
+function Test-PrincessSameDayScenicContinuation($previous, $current) {
+  if (!$previous -or !$current) { return $false }
+  if (!$current.id -or !$current.arrivalTime -or !$current.departTime) { return $false }
+  if ($current.resFlag1 -or $current.resFlag2 -or $current.resDesc1 -or $current.resDesc2) { return $false }
+
+  $previousIsScenic =
+    ([string]$previous.resFlag1 -eq "SE") -or
+    ([string]$previous.resFlag2 -eq "SE") -or
+    ([string]$previous.resDesc1 -eq "SCENIC CRUISING") -or
+    ([string]$previous.resDesc2 -eq "SCENIC CRUISING")
+  if (!$previousIsScenic -or !$previous.departTime) { return $false }
+  if ((D $previous.arrivalDt) -ne (D $current.arrivalDt)) { return $false }
+
+  $previousPrefix = [regex]::Match([string]$previous.id, '^([A-Za-z]{2})')
+  $currentPrefix = [regex]::Match([string]$current.id, '^([A-Za-z]{2})')
+  if (!$previousPrefix.Success -or !$currentPrefix.Success) { return $false }
+  if ($previousPrefix.Groups[1].Value -ne $currentPrefix.Groups[1].Value) { return $false }
+
+  try {
+    $previousDeparture = [datetime]::Parse([string]$previous.departTime)
+    $currentArrival = [datetime]::Parse([string]$current.arrivalTime)
+    return ($currentArrival -eq $previousDeparture.AddMinutes(1))
+  } catch {
+    return $false
+  }
+}
+
 function Port($id, $name, $country, $region = $null) {
   [pscustomobject]@{
     providerId  = $id
@@ -141,7 +201,9 @@ if ($Provider -eq "PRINCESS") {
         $eventsByDate = @{}
         $unknownPrincessEvents = 0
 
-        foreach ($x in @($ip.itineraries)) {
+        $providerRows = @($ip.itineraries)
+        for ($i = 0; $i -lt $providerRows.Count; $i++) {
+          $x = $providerRows[$i]
           $date = D $x.arrivalDt
           if (!$date) {
             throw "Princess itinerary row has no arrivalDt: voyage=$($v.id) id=$($x.id)"
@@ -162,6 +224,7 @@ if ($Provider -eq "PRINCESS") {
           }
 
           $pp = if ($code) { $pm[[string]$code] } else { $null }
+          $previousProviderRow = if ($i -gt 0) { $providerRows[$i - 1] } else { $null }
 
           # IDL is a synthetic Princess location for crossing the International
           # Date Line. Some rows lack resFlag1=CD, so provider code is the more
@@ -170,9 +233,29 @@ if ($Provider -eq "PRINCESS") {
             if ([string]$code -eq "IDL") { "DATE_LINE" }
             elseif (!$x.id) { "SEA" }
             elseif ($x.resFlag1 -eq "CD") { "DATE_LINE" }
-            elseif ($x.resFlag1 -eq "SE" -or $x.resDesc1 -eq "SCENIC CRUISING" -or ($pp -and $pp.name -match "Scenic Cruising")) { "SCENIC_CRUISING" }
+            elseif ($x.resFlag1 -eq "SE" -or $x.resFlag2 -eq "SE" -or
+                    $x.resDesc1 -eq "SCENIC CRUISING" -or $x.resDesc2 -eq "SCENIC CRUISING" -or
+                    (Test-PrincessSameDayScenicContinuation $previousProviderRow $x) -or
+                    ($pp -and $pp.name -match "Scenic Cruising")) { "SCENIC_CRUISING" }
             elseif ($pp) { "PORT" }
             else { "UNKNOWN" }
+
+          $departureTime = T $x.departTime
+
+          if ($type -eq "SCENIC_CRUISING" -and
+              (([string]$x.resFlag2 -eq "AM") -or ([string]$x.resDesc2 -eq "DEPARTS AFTER MIDNIGHT") -or
+               ([string]$x.resFlag1 -eq "ON") -or ([string]$x.resDesc1 -eq "OVERNIGHT"))) {
+            $continuation = if (($i + 1) -lt $providerRows.Count) { $providerRows[$i + 1] } else { $null }
+            if (!(Test-PrincessOvernightScenicContinuation $x $continuation)) {
+              throw "Princess scenic event marked DEPARTS AFTER MIDNIGHT has no valid next-day continuation: voyage=$($v.id) id=$($x.id)"
+            }
+
+            # Emit one logical scenic event on its start date. The canonical
+            # model has no separate departure date, so the earlier clock time
+            # is understood to occur after midnight on the following date.
+            $departureTime = T $continuation.departTime
+            $i++
+          }
 
           if ($type -eq "UNKNOWN") { $unknownPrincessEvents++ }
 
@@ -192,7 +275,7 @@ if ($Provider -eq "PRINCESS") {
             port          = $po
             visitType     = $visitType
             arrivalTime   = T $x.arrivalTime
-            departureTime = T $x.departTime
+            departureTime = $departureTime
           }
 
           if (!$eventsByDate.ContainsKey($date)) {

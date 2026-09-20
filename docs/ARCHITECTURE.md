@@ -1,0 +1,16 @@
+# Architecture
+
+The system separates provider acquisition, canonical voyage normalization, configuration evidence, static ship masters, and later high-frequency availability/pricing observations.
+
+## Evidence rules
+
+- Future-only configuration discovery: `sailDate > surveyStartDate`; a voyage departing today is excluded.
+- Never infer a deck from a cabin number.
+- A physical configuration ID and a commercial offer/category signature are different namespaces.
+- A later no-inventory/provider-error observation does not erase earlier exact-sailing proof.
+- Conflicting exact-sailing configuration evidence fails closed.
+- Celebrity sailing-specific GraphQL itinerary data is authoritative for the voyage pipeline; the legacy itinerary crawler is diagnostic only.
+- Static masters are keyed by provider + ship + physical configuration and are not rediscovered every Daily run.
+- Runtime provider responses and generated masters live under `work/` and are never source artifacts.
+
+Celebrity static discovery uses only the JSON room-selection API and its deck-plan layout token. Princess configuration identity comes from the ship version attached to each provider voyage. Princess deck content is retained only from non-empty structured `getDeckJSON.do` responses for that exact ship/version.
