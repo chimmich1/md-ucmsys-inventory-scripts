@@ -1,5 +1,26 @@
 # Changelog
 
+## 1.0.0-rc5-hotfix3
+
+- Reconcile every existing Celebrity catalog entry against its local published
+  master and validation report, including saturated, already-tested, and retired
+  configurations. Recover promoted increments before the next provider call.
+- Publish catalogs atomically and refresh the Celebrity catalog after each
+  completed configuration, making restarts recover the promotion/publication gap.
+- Resolve legacy Windows and POSIX absolute catalog paths within the selected
+  state tree even when the original location still exists. New paths use forward
+  slashes relative to `work/state/static-masters` for both providers.
+- Add `master/reconcile-catalogs.py` for offline metadata repair without collecting
+  or rebuilding masters. Missing or conflicting Celebrity evidence fails closed;
+  Princess relocation preserves and verifies existing hashes.
+- Preserve complete Python stderr and exit codes through a shared native-command
+  wrapper under Windows PowerShell 5.1, including redirected run logs.
+- Add relocation, interrupted-increment recovery, atomic publication, read-only
+  validation, and PowerShell traceback regressions. Include both historical
+  registry test scripts in the standard pytest suite.
+- Document cumulative runtime-state preservation, relocation, recovery, and the
+  project handoff. Clean-room release acceptance remains outstanding.
+
 ## 1.0.0-rc5-hotfix2
 
 - Store Celebrity and Princess static-master catalog paths relative to `work/state/static-masters`, allowing runtime state to move between DEV and PROD locations and between Windows and Linux.

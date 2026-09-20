@@ -1,12 +1,57 @@
 # Operations
 
+## Preserve an existing installation
+
+`work/data` and `work/state` are cumulative operational state, even though Git
+ignores them. Back up and copy both when relocating an installation. Do not run
+Full, clear state, or rebuild masters to repair catalog metadata. The empty-clone
+procedure below is a separate release acceptance exercise.
+
+In RC5-hotfix3, both provider catalogs store forward-slash paths relative to
+`work/state/static-masters`. Validation maps legacy Windows/POSIX absolute paths
+to the selected local tree, even if the old workspace still exists. Missing local
+masters fail validation; the old location is never a fallback.
+
+After relocation or an interrupted Celebrity increment, repair metadata offline:
+
+```powershell
+python .\master\reconcile-catalogs.py --state .\work\state
+.\build-cruise-master.ps1 -Mode Validate
+```
+
+The repair updates only the two catalogs and Celebrity manifest catalog reference.
+It makes no provider calls and preserves masters, cumulative validation reports,
+raw evidence, registry, canonical voyages, and checkpoints. It refreshes every
+Celebrity entry's relative path, SHA-256, and saturation from the published master
+and validation pair. Missing files, identity mismatches, cabin/deck conflicts, or
+inconsistent saturation stop repair. Princess paths are relocated only after
+their existing hashes match local files. Each JSON replacement is atomic and
+rerunning the command is safe if it is interrupted between documents.
+
+Daily performs the same Celebrity reconciliation before collection and after
+each completed configuration. Thus an increment promoted before a crash is
+recatalogued on restart even if its voyages are already tested or it is saturated.
+This repairs a completed promotion/catalog gap; it is not a rollback mechanism
+for arbitrary damage or a partially promoted, inconsistent master/report pair.
+Investigate such inconsistencies rather than deleting cumulative state.
+
+All pipeline Python stages preserve complete stderr under Windows PowerShell 5.1
+and fail on the exit code after diagnostics have been emitted. For a run log:
+
+```powershell
+.\build-cruise-master.ps1 -Mode Validate *>&1 |
+    Tee-Object -FilePath .\work\logs\validate.log
+```
+
 ## Starting from zero
 
 A clean Git clone needs Python, PowerShell, Internet access, and dependencies in `requirements.txt`. Do not copy any old `work/` directory, registry, survey, voyage JSON, cabin master, or cache into the clone.
 
 Run `Full` once. It acquires voyages, normalizes them, surveys physical configurations, archives immutable runtime evidence, builds Registry V1.2, discovers static masters where evidence permits, and validates generated masters.
 
-Run `Daily` thereafter. Existing Celebrity provider+ship+configuration masters are preserved; only newly proven configurations are candidates for static discovery. Provider voyage data and survey evidence are refreshed.
+Run `Daily` thereafter. Existing unsaturated Celebrity masters advance using newly
+proven, previously untested published voyages; saturated configurations are
+skipped. Provider voyage data and survey evidence are refreshed.
 
 Run `Validate` at any time after Full. Validate does not create directories, checkpoints, manifests, or other state.
 
@@ -36,11 +81,30 @@ To resume a completed acquisition/survey run specifically at incremental
 Celebrity masters, preserving canonical data and the current registry:
 
 ```powershell
-.\build-cruise-master.ps1 -Mode Daily -RestartRun -ResumeAtCelebrityMasters
+.\build-cruise-master.ps1 -Mode Daily -ResumeAtCelebrityMasters
 ```
 
-`-RestartRun` clears only that date's run checkpoints. The resume switch then
-skips acquisition, normalization, fleet survey, and registry import.
+The resume switch skips acquisition, normalization, fleet survey, and registry
+import. Existing checkpoints for this date, mode, and VERSION are honored. A
+version change creates a different run key, so explicitly use the resume switch
+to avoid repeating acquisition. `-RestartRun` clears that run's checkpoints and
+should be used only when intentionally rerunning completed stages. Catalog-only
+repair does not need it and does not contact providers.
+
+## Developer verification
+
+```powershell
+python -m pip install -r requirements.txt
+python -m pip install pytest
+python -m pytest tests -q
+.\build-cruise-master.ps1 -Mode Validate
+```
+
+Tests use synthetic temporary state. The pytest suite also runs the two legacy
+registry scripts. PowerShell stderr tests execute Windows PowerShell 5.1 and
+check complete tracebacks in console output and Tee-Object logs. They are skipped
+on systems without `powershell.exe`. Use the pipeline's `-Python` parameter for
+an explicit interpreter path when `python` is unavailable in the current shell.
 
 ## Clean-room release acceptance
 

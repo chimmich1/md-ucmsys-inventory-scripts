@@ -13,6 +13,7 @@ param(
 )
 $ErrorActionPreference="Stop"
 $PipelineDir=Split-Path -Parent $MyInvocation.MyCommand.Path
+. (Join-Path $PipelineDir "invoke-native.ps1")
 $RepoRoot=Split-Path -Parent $PipelineDir
 if(!$DataDir){$DataDir=Join-Path $RepoRoot "work\data"}
 if(!$StateDir){$StateDir=Join-Path $RepoRoot "work\state"}
@@ -87,9 +88,7 @@ function Invoke-ChildPowerShellScript {
     "-File",$ScriptPath
   ) + $Arguments
 
-  & powershell.exe @argList
-  $code=$LASTEXITCODE
-  if($code -ne 0){throw "Child PowerShell script failed: $ScriptPath (exit code $code)"}
+  Invoke-NativeCommand -Executable "powershell.exe" -Arguments $argList
 }
 
 
@@ -106,8 +105,7 @@ if($Mode -eq "Validate"){
   Write-Host "Celebrity voyages: $(@($c.voyages).Count)"
   if($r.version -ne "1.2"){throw "Expected Registry V1.2; found $($r.version)"}
   if(@($r.conflicts).Count -gt 0){throw "Registry contains physical-configuration conflicts"}
-  & $Python (Join-Path $RepoRoot "master\validate-masters.py") --state $StateDir
-  if($LASTEXITCODE -ne 0){throw "Static-master validation failed"}
+  Invoke-NativeCommand -Executable $Python -Arguments @((Join-Path $RepoRoot "master\validate-masters.py"), "--state", $StateDir)
   Write-Host "Validation complete (read-only)." -ForegroundColor Green
   exit 0
 }
@@ -157,30 +155,26 @@ Require $Princess; Require $Celebrity
 if(!$ResumeAtPrincessMasters -and !$ResumeAtCelebrityMasters){
 Step "Fleet physical-configuration survey" {
   New-Item -ItemType Directory -Force -Path $TimelineOut | Out-Null
-  & $Python (Join-Path $Timeline "celebrity-fleet-timeline-v1.0.py") `
-    --voyages $Celebrity --survey-start $SurveyStart --max-probes 0 `
-    --out (Join-Path $TimelineOut "celebrity-fleet-timeline-v1.0.json")
-  if($LASTEXITCODE -ne 0){throw "Celebrity fleet timeline failed"}
-  & $Python (Join-Path $Timeline "princess-fleet-timeline-preflight-v1.0.py") `
-    --voyages $Princess --survey-start $SurveyStart `
-    --out (Join-Path $TimelineOut "princess-fleet-timeline-preflight-v1.0.json")
-  if($LASTEXITCODE -ne 0){throw "Princess fleet timeline preflight failed with exit code $LASTEXITCODE"}
+  Invoke-NativeCommand -Executable $Python -Arguments @(
+    (Join-Path $Timeline "celebrity-fleet-timeline-v1.0.py"),
+    "--voyages", $Celebrity, "--survey-start", $SurveyStart, "--max-probes", "0",
+    "--out", (Join-Path $TimelineOut "celebrity-fleet-timeline-v1.0.json"))
+  Invoke-NativeCommand -Executable $Python -Arguments @(
+    (Join-Path $Timeline "princess-fleet-timeline-preflight-v1.0.py"),
+    "--voyages", $Princess, "--survey-start", $SurveyStart,
+    "--out", (Join-Path $TimelineOut "princess-fleet-timeline-preflight-v1.0.json"))
 }
 
 Step "Archive + append Celebrity evidence registry" {
   $SurveyFile = Join-Path $TimelineOut "celebrity-fleet-timeline-v1.0.json"
   Require $SurveyFile
 
-  & $Python `
-    (Join-Path $RegistryTool "archive-and-import-survey-v1.0.py") `
-    --survey $SurveyFile `
-    --archive-dir (Join-Path $StateDir "source-surveys\celebrity") `
-    --registry $Registry `
-    --registry-tool (Join-Path $RegistryTool "fleet-configuration-registry-v1.2.py")
-
-  if($LASTEXITCODE -ne 0){
-    throw "Celebrity survey archive/registry import failed with exit code $LASTEXITCODE"
-  }
+  Invoke-NativeCommand -Executable $Python -Arguments @(
+    (Join-Path $RegistryTool "archive-and-import-survey-v1.0.py"),
+    "--survey", $SurveyFile,
+    "--archive-dir", (Join-Path $StateDir "source-surveys\celebrity"),
+    "--registry", $Registry,
+    "--registry-tool", (Join-Path $RegistryTool "fleet-configuration-registry-v1.2.py"))
 }
 
 } elseif($ResumeAtCelebrityMasters) {
@@ -199,31 +193,21 @@ Step "Archive + append Celebrity evidence registry" {
 
 if(!$ResumeAtPrincessMasters){
 Step "Celebrity static cabin/category masters" {
-  # Windows PowerShell 5.1 writes a native program's stderr into its error
-  # stream. With the pipeline-wide Stop preference, the first traceback line
-  # would otherwise become a terminating PowerShell error and hide the rest of
-  # the Python traceback. Let the native process finish, preserve all stderr in
-  # the caller's transcript/Tee-Object stream, then fail from its exit code.
-  $savedErrorActionPreference=$ErrorActionPreference
-  try {
-    $ErrorActionPreference="Continue"
-    & $Python (Join-Path $RepoRoot "master\build-static-masters.py") --mode $Mode --voyages $Celebrity --registry $Registry --state $StateDir --data $DataDir --python $Python
-    $pythonExitCode=$LASTEXITCODE
-  } finally {
-    $ErrorActionPreference=$savedErrorActionPreference
-  }
-  if($pythonExitCode -ne 0){throw "Celebrity static-master discovery failed (exit code $pythonExitCode)"}
+  Invoke-NativeCommand -Executable $Python -Arguments @(
+    (Join-Path $RepoRoot "master\build-static-masters.py"), "--mode", $Mode,
+    "--voyages", $Celebrity, "--registry", $Registry, "--state", $StateDir,
+    "--data", $DataDir, "--python", $Python)
 }
 }
 
 Step "Princess published static masters" {
-  & $Python (Join-Path $RepoRoot "master\build-princess-published-masters.py") --mode $Mode --voyages $Princess --state $StateDir --python $Python
-  if($LASTEXITCODE -ne 0){throw "Princess published static-master discovery failed"}
+  Invoke-NativeCommand -Executable $Python -Arguments @(
+    (Join-Path $RepoRoot "master\build-princess-published-masters.py"), "--mode", $Mode,
+    "--voyages", $Princess, "--state", $StateDir, "--python", $Python)
 }
 
 Step "Validate generated masters" {
-  & $Python (Join-Path $RepoRoot "master\validate-masters.py") --state $StateDir
-  if($LASTEXITCODE -ne 0){throw "Generated master validation failed"}
+  Invoke-NativeCommand -Executable $Python -Arguments @((Join-Path $RepoRoot "master\validate-masters.py"), "--state", $StateDir)
 }
 
 
