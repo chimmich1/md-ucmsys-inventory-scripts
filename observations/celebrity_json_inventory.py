@@ -8,7 +8,8 @@ from __future__ import annotations
 import argparse, json
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Callable`r`nfrom .category_pricing import category_pricing
+from typing import Any, Callable
+from .category_pricing import category_pricing
 
 @dataclass(frozen=True)
 class Job:
@@ -82,3 +83,4 @@ def publish(path: Path, observations: list[dict[str, Any]]) -> None:
     temporary = path.with_suffix(path.suffix + ".tmp")
     temporary.write_text(json.dumps(observations, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     temporary.replace(path)
+
