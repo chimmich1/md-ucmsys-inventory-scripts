@@ -138,11 +138,19 @@ def audit(state, classes_path):
                 raise ValueError(f"master identity mismatch: {path}")
             source_id = f"{provider}/{ship}/{config}"
             physical, definitions, assignments = extract(provider, document)
+            physical_payload = {cabin: {field: sorted(values) for field, values in sorted(fields.items())}
+                                for cabin, fields in sorted(physical.items())}
+            definition_payload = {key: {digest: value for digest, value in sorted(variants.items())}
+                                  for key, variants in sorted(definitions.items())}
+            assignment_payload = {cabin: sorted(values) for cabin, values in sorted(assignments.items())}
             class_id = classes.get((provider, ship))
             missing = {field: sum(values[field] == {"null"} for values in physical.values()) for field in PHYSICAL_FIELDS}
             sources.append({"sourceId": source_id, "path": path.relative_to(static).as_posix(),
                             "sha256": inputs[path], "provider": provider, "shipCode": ship,
                             "configurationId": config, "classId": class_id,
+                            "physicalEvidenceSha256": fingerprint(physical_payload),
+                            "categoryEvidenceSha256": fingerprint(definition_payload),
+                            "assignmentEvidenceSha256": fingerprint(assignment_payload),
                             "observedCabins": len(physical), "unknownFields": missing,
                             "legacySaturated": item.get("saturated"),
                             "membershipCompleteness": "UNVERIFIED"})

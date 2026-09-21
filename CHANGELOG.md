@@ -46,6 +46,21 @@
 - Keep legacy saturation separate from completion. Attribute and assignment proofs
   apply only to confirmed source membership and do not prove membership complete.
 
+## Unreleased — maintenance integration PR-05
+
+- Bootstrap the transactional snapshot from local legacy evidence on the first
+  Daily, then replace broad legacy cabin discovery with queue-driven maintenance.
+- Group work into exact provider/ship/configuration jobs. Princess recollects only
+  known affected decks; new configurations retain the 20-deck bound. Celebrity
+  selects only targeted configurations and at most one prior voyage when no new
+  voyage is available.
+- Record unresolved work as discovery-stalled after one no-progress attempt, so an
+  unchanged Daily makes zero repeat cabin calls until evidence/policy changes or
+  the operator uses `--retry-stalled`.
+- Preserve historical Princess catalog configurations absent from current voyages.
+- Hash physical, category, and assignment evidence independently so a commercial-
+  only update does not change the physical revision identity.
+
 ## 1.0.0-rc5-hotfix3
 
 - Reconcile every existing Celebrity catalog entry against its local published

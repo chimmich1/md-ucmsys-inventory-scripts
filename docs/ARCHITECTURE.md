@@ -21,6 +21,21 @@ measurements are stalled outside the automatic queue. Operator and factory-refre
 targets are explicit inputs; periodic work remains unscheduled until evidence has
 a supported verification date.
 
+PR-05 makes Daily queue-driven. It derives locally known configurations from the
+Celebrity registry and Princess voyage-bound versions, compares them with snapshot
+sources, adds new configurations, and groups assessment items by exact source ID.
+One builder invocation per affected provider receives an explicit configuration
+filter. Successful collection is materialized as a new transactional snapshot;
+failure leaves the active pointer unchanged. Work still present after the resulting
+snapshot is recorded in `maintenance-state.json` as stalled and is suppressed for
+that snapshot/policy combination. Changed evidence or policy, or explicit retry,
+re-enables it.
+
+Evidence hashes are namespace-specific. Assignment-only evidence changes the
+assignment revision and overall snapshot manifest, while unchanged physical and
+category documents keep their revision identities. The full legacy-master file hash
+continues to be validated during materialization but is not a physical revision ID.
+
 ## Evidence rules
 
 - Future-only configuration discovery: `sailDate > surveyStartDate`; a voyage departing today is excluded.

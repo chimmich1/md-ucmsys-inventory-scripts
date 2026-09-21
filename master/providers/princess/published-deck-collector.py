@@ -38,8 +38,12 @@ def main():
     ap.add_argument("--out", required=True)
     ap.add_argument("--deck-min", type=int, default=1)
     ap.add_argument("--deck-max", type=int, default=20)
+    ap.add_argument("--decks", default="", help="comma-separated exact deck probes")
     a = ap.parse_args()
-    if a.deck_min < 0 or a.deck_max < a.deck_min or a.deck_max > 99:
+    exact_decks = ([int(value) for value in a.decks.split(",") if value]
+                   if a.decks else list(range(a.deck_min, a.deck_max + 1)))
+    if (a.deck_min < 0 or a.deck_max < a.deck_min or a.deck_max > 99 or
+            not exact_decks or any(number < 0 or number > 99 for number in exact_decks)):
         raise SystemExit("invalid bounded deck-probe range")
 
     session = requests.Session()
@@ -47,7 +51,7 @@ def main():
     probe_audit = []
     fatal_probes = []
     response_fingerprints = {}
-    for number in range(a.deck_min, a.deck_max + 1):
+    for number in sorted(set(exact_decks)):
         deck = str(number)
         response = session.get(
             BASE + "/getDeckJSON.do",
@@ -95,7 +99,7 @@ def main():
     if not rows:
         raise SystemExit(
             f"no provider-confirmed cabin decks for {a.ship} version {a.version} "
-            f"after bounded getDeckJSON probes {a.deck_min}..{a.deck_max}"
+            f"after bounded getDeckJSON probes {','.join(map(str, sorted(set(exact_decks))))}"
         )
 
     payload = {
@@ -107,7 +111,8 @@ def main():
         "voyageBindingProven": True,
         "deckDiscovery": {
             "method": "BOUNDED_PROVIDER_JSON_PROBES",
-            "range": {"minimum": a.deck_min, "maximum": a.deck_max},
+            "range": {"minimum": min(exact_decks), "maximum": max(exact_decks)},
+            "exactProbes": sorted(set(exact_decks)),
             "acceptanceRule": "structured getDeckJSON response containing one or more cabins",
             "probes": probe_audit,
         },

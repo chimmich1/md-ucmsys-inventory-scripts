@@ -101,7 +101,10 @@ def main():
     parser.add_argument("--state", required=True)
     parser.add_argument("--data", required=True)
     parser.add_argument("--python", default=sys.executable)
+    parser.add_argument("--configuration-filter", default="",
+                        help="comma-separated SHIP/CONFIG targets; selected existing targets are reverified")
     args = parser.parse_args()
+    targets = {tuple(value.split("/", 1)) for value in args.configuration_filter.split(",") if value}
 
     root = Path(__file__).resolve().parent
     state = Path(args.state)
@@ -141,8 +144,13 @@ def main():
     advanced = []
     skipped_saturated = []
     skipped_no_new_voyages = []
+    skipped_not_targeted = []
 
     for (ship, configuration), registry_ids in sorted(configurations.items()):
+        forced = bool(targets) and (ship, configuration) in targets
+        if targets and not forced:
+            skipped_not_targeted.append(f"{ship}:{configuration}")
+            continue
         destination = masters / ship / configuration
         final = destination / f"celebrity-ship-master-{ship}-v2.2.json"
         validation_path = destination / f"celebrity-ship-master-validation-{ship}-v2.2.json"
@@ -154,14 +162,17 @@ def main():
             baseline = final
             previous_validation = validation_path
             validation = load(validation_path)
-            if bool((validation.get("saturation") or {}).get("saturated")):
+            if not forced and bool((validation.get("saturation") or {}).get("saturated")):
                 skipped_saturated.append(f"{ship}:{configuration}")
                 continue
             untested_ids = sorted(set(eligible_ids) - tested_voyages(validation))
-            if not untested_ids:
+            if not forced and not untested_ids:
                 skipped_no_new_voyages.append(f"{ship}:{configuration}")
                 continue
-            selected_ids = untested_ids
+            selected_ids = untested_ids or eligible_ids[:1]
+            if not selected_ids:
+                skipped_no_new_voyages.append(f"{ship}:{configuration}")
+                continue
             output = masters / ".daily-staging" / ship / configuration
             if output.exists():
                 shutil.rmtree(output)
@@ -233,6 +244,7 @@ def main():
         "advanced": advanced,
         "skippedSaturated": skipped_saturated,
         "skippedNoNewVoyages": skipped_no_new_voyages,
+        "skippedNotTargeted": skipped_not_targeted,
         # Backward-compatible aggregate for existing manifest consumers.
         "skippedExisting": skipped_saturated + skipped_no_new_voyages,
         "knownProvenConfigurationCount": len(configurations),

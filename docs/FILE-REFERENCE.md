@@ -20,6 +20,9 @@
 | `master/activate-permanent-master-snapshot.py` | Verifies and atomically activates an existing snapshot for rollback. | Permanent-master active pointer |
 | `master/assess-permanent-masters.py` | Evaluates independent completion dimensions and writes a targeted offline refresh queue. | Caller-selected report |
 | `master/permanent_master_policy.py` | Applies required/stalled fields, proofs, conflicts, assignments, and explicit refresh triggers. | None (pure assessment) |
+| `master/maintain-permanent-masters.py` | Executes grouped Daily queue jobs, republishes changed snapshots, and records no-progress work. | Legacy target masters, permanent snapshot, maintenance report/state |
+| `master/plan-permanent-maintenance.py` | Previews exact Daily jobs without provider calls or state changes. | Caller-selected plan report |
+| `master/permanent_master_maintenance.py` | Pure planning plus bounded provider-builder orchestration. | Through explicitly invoked builders |
 | `config/permanent-master-refresh-policy.json` | Required fields, stalled fields, allowed triggers, and periodic verification intervals. | Policy input |
 | `master/permanent_master_snapshot.py` | Deterministic snapshot construction, publication, restart recovery, and validation. | Caller-selected snapshot root |
 | `pipeline/invoke-native.ps1` | Preserves complete native stderr before checking exit codes. | No |

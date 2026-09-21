@@ -35,3 +35,9 @@ It tracks membership, attributes, category definitions, and assignments separate
 limit and retry condition; `UNVERIFIED` makes no completeness claim. Attribute and
 assignment proofs cover confirmed membership only. The refresh queue aggregates
 work by provider, ship, dimension, field, and source configuration.
+
+Each source has separate physical, category-definition, and assignment evidence
+hashes. A document references the hash for its own namespace using `hashScope`.
+This keeps revision identities independent when one legacy source file contains
+both physical and commercial records. Maintenance state is mutable scheduling
+metadata, not master evidence; its stalled keys are bound to snapshot and policy.

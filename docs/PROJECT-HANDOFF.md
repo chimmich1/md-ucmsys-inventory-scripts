@@ -2,14 +2,18 @@
 
 ## Active next steps
 
-PR-01 through PR-03 merged as GitHub PRs 2–4. PR-04 is implemented on
-`feat/pr04-completion-refresh-policy`: independent completion proofs, stalled
-fields, explicit manual/factory triggers, unscheduled migrated periodic dates, and
-a deterministic targeted queue. All 60 tests and read-only legacy Validate pass.
-The offline real assessment is `work/logs/pr04-completion-assessment.json`: nine
-missing-field groups plus three Princess accessibility contradictions. It makes no
-provider calls or runtime-state changes. After review/merge, continue PR-05 collector
-integration with zero-call/bounded-call tests before any monitored collection.
+PR-01 through PR-04 merged as GitHub PRs 2–5. PR-05 is implemented on
+`feat/pr05-maintenance-integration`: queue-driven Daily, Full snapshot bootstrap,
+exact configuration filters, one-attempt no-progress stalling, historical Princess
+retention, exact-deck Princess targeting, and namespace-independent revision hashes.
+All 69 tests and read-only legacy Validate pass. The revised real snapshot
+`02497c227cc9cc7fb008ede8` and its
+12-item assessment are under ignored `work/logs/pr05-*`; runtime state was not
+migrated and no provider calls were made. After review/merge, PR-06 must run migrated
+and clean-room acceptance before any 1.0.0 promotion.
+
+The offline PR-05 plan contains 19 Princess configuration jobs but only 25 exact
+deck requests, with no full scans and no Celebrity jobs. This plan was not executed.
 
 The approved permanent-master redesign is tracked in
 [PERMANENT-MASTER-ROADMAP.md](PERMANENT-MASTER-ROADMAP.md). It defines six numbered
