@@ -61,6 +61,7 @@ class CelebrityJsonOnlyTests(unittest.TestCase):
         self.assertIn('celebrity-inventory.py', wrapper)
         self.assertIn("MAX_ATTEMPTS = 4", source)
         self.assertIn("PAGE_SIZE = 100", source)
+        self.assertIn("skip += len(cruises)", source)
         self.assertNotIn('"count": 1000', source)
         self.assertIn("pagination count mismatch", source)
         self.assertIn("duplicate cruise-group IDs", source)

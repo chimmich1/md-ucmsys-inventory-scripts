@@ -162,7 +162,11 @@ def main():
             f"accumulated={len(all_cruises)}/{expected_total}",
             flush=True,
         )
-        skip += PAGE_SIZE
+        # Advance by the number actually returned.  The provider has returned
+        # short non-terminal pages (for example 99 groups for a count=100
+        # request); advancing by PAGE_SIZE would skip the next group and create
+        # a false empty final page.
+        skip += len(cruises)
 
     if len(all_cruises) != expected_total:
         raise RuntimeError(
