@@ -8,7 +8,7 @@ from __future__ import annotations
 import argparse, json
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any, Callable`r`nfrom .category_pricing import category_pricing
 
 @dataclass(frozen=True)
 class Job:
@@ -62,7 +62,7 @@ def collect(job: Job, selectors: list[tuple[str, str]], decks: list[str], reques
             returned = {str(item.get("code", item.get("number"))).zfill(2) for item in inventory.get("decks", []) if item.get("code", item.get("number")) is not None}
             if deck_code not in returned:
                 raise RuntimeError(f"Requested deck {deck_code} absent from provider response for {type_code}/{subtype_code}")
-            observations.append({"selector": {"typeCode": type_code, "subtypeCode": subtype_code}, "requestedDeckCode": deck_code, "roomNumbers": inventory, "raw": payload})
+            observations.append({"selector": {"typeCode": type_code, "subtypeCode": subtype_code}, "requestedDeckCode": deck_code, "roomNumbers": inventory, "categoryPricing": category_pricing(inventory), "raw": payload})
     return observations
 
 
@@ -74,3 +74,11 @@ def main() -> None:
     raise SystemExit("Live execution is intentionally not wired to a browser; use the provider JSON transport adapter.")
 
 if __name__ == "__main__": main()
+
+
+def publish(path: Path, observations: list[dict[str, Any]]) -> None:
+    """Atomically publish a complete observation array."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    temporary.write_text(json.dumps(observations, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    temporary.replace(path)

@@ -17,3 +17,5 @@ For JSON-only full-ship jobs, deck_codes_from_master.py extracts the known deck 
 celebrity_json_inventory.py contains the JSON-only deck enumeration core. It places the requested deck in ooms[0].room.deckCode, queries every deck supplied by the physical master, retains raw JSON evidence, and fails closed when a requested deck is absent. Transport wiring remains explicit and provider-only.
 
 category_pricing.py normalizes the provider's category pricing and cabin membership from each oomNumbers response while preserving the native pricing object.
+
+Successful JSON observations can be written with publish, which replaces the destination atomically through a same-directory temporary file.
