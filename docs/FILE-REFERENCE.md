@@ -36,3 +36,5 @@
 | `tests/*` | Deterministic registry, provider, catalog recovery/relocation, and Windows stderr regressions; production snapshots must not be fixtures. | Temporary test dirs only |
 | `requirements.txt` | Python runtime dependencies. | No |
 | `VERSION` | Pipeline/release version. | No |
+| `docs/USER-GUIDE.md` | Complete installation, operation, option, output, schema, and troubleshooting guide. | No |
+| `schemas/` | Draft 2020-12 consumer schemas for canonical voyages, registry, catalogs, snapshot metadata, and permanent masters. | No |
