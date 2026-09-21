@@ -7,10 +7,11 @@ collected data, then maintain them through targeted discovery. Routine voyages
 must not trigger repeated discovery of established physical cabin facts.
 
 Current work: **PR-04, completion and targeted-refresh policy**.
-Branch: `feat/pr04-completion-refresh-policy`. PR-03 merged as GitHub PR 4;
-PR-02 as GitHub PR 3; PR-01 as GitHub PR 2. PR sequence numbers below are stable
-roadmap IDs, not GitHub issue numbers. Each PR depends on the preceding merged PR
-unless explicitly noted.
+Branch: `feat/pr04-completion-refresh-policy`. Draft GitHub PR 5:
+https://github.com/chimmich1/md-ucmsys-inventory-scripts/pull/5. PR-03 merged as
+GitHub PR 4; PR-02 as GitHub PR 3; PR-01 as GitHub PR 2. PR sequence numbers below
+are stable roadmap IDs, not GitHub issue numbers. Each PR depends on the preceding
+merged PR unless explicitly noted.
 
 PR-04 implementation is ready for review. Next action after merge: PR-05 integrates
 the queue with maintenance-mode Daily and bootstrap Full. Do not call providers or
