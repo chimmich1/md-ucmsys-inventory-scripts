@@ -119,6 +119,10 @@ snapshot `fd3ba17bd21cd53aecee93ec`. A fresh Celebrity acquisition can still fai
 closed at the pagination boundary when the provider reports 610 groups but returns
 609 unique groups; the previous valid raw artifact is preserved and must not be
 silently replaced by incomplete data.
+
+PR-07 is the next planned change. Read
+`docs/PR-07-CLASS-AWARE-DISCOVERY-PLAN.md` before modifying collector behavior.
+The plan must be reviewed and merged as its own PR before implementation starts.
 Multi-file master promotion is still not one atomic filesystem transaction;
 reconciliation addresses a completed promotion followed by interrupted catalog
 publication, not arbitrary corruption or every possible partial-file promotion.
