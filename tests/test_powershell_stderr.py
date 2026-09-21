@@ -1,6 +1,7 @@
 import shutil
 import subprocess
 import sys
+import re
 from pathlib import Path
 
 import pytest
@@ -75,5 +76,7 @@ def test_root_pipeline_failure_is_logged_and_returns_nonzero(tmp_path):
     assert log.exists()
     logged = log.read_text(encoding="utf-16")
     assert "Missing required file" in logged
+    assert all(re.match(r"^\[\d{4}-\d{2}-\d{2}T.*Z\] ", line)
+               for line in logged.splitlines() if line)
     assert "Complete output:" in result.stderr
     assert log.name in result.stderr

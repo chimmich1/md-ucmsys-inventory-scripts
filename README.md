@@ -6,7 +6,9 @@ An existing working copy can contain required cumulative runtime state in ignore
 
 Every root command writes the same complete output shown in the console to a
 timestamped file under `work/logs`. Use `-LogPath <path>` for a specific name.
-Princess collection reports durable request counts rather than a progress display.
+Every emitted log line begins with an ISO 8601 UTC timestamp so stage and request
+timing can be audited. Princess collection reports durable request counts rather
+than a progress display.
 
 ## Existing installations and relocated runtime state
 

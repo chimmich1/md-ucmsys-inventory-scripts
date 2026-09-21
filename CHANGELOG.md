@@ -61,6 +61,11 @@
 - Hash physical, category, and assignment evidence independently so a commercial-
   only update does not change the physical revision identity.
 
+## Unreleased — release acceptance PR-06
+
+- Prefix every future root console/log line with an ISO 8601 UTC receipt timestamp
+  so provider request cadence, stage duration, warnings, and failures are auditable.
+
 ## 1.0.0-rc5-hotfix3
 
 - Reconcile every existing Celebrity catalog entry against its local published

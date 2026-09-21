@@ -60,7 +60,7 @@ if (!$LogPath) {
 }
 $logParent = Split-Path -Parent $LogPath
 New-Item -ItemType Directory -Force -Path $logParent | Out-Null
-Write-Host "Run log: $LogPath"
+Write-Host "[$((Get-Date).ToUniversalTime().ToString('o'))] Run log: $LogPath"
 
 $childArguments = @("-NoLogo", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", $script,
     "-Mode", $Mode, "-SurveyStart", $SurveyStart, "-Python", $Python)
@@ -76,7 +76,11 @@ $savedPreference = $ErrorActionPreference
 try {
     $ErrorActionPreference = "Continue"
     & powershell.exe @childArguments 2>&1 |
-        ForEach-Object { $_.ToString() } |
+        ForEach-Object {
+            foreach ($line in ($_.ToString() -split "`r?`n")) {
+                "[$((Get-Date).ToUniversalTime().ToString('o'))] $line"
+            }
+        } |
         Tee-Object -FilePath $LogPath
     $pipelineExitCode = $LASTEXITCODE
 } finally {
