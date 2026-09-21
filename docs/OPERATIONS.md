@@ -127,7 +127,9 @@ python -m pip install -r requirements.txt
 .\build-cruise-master.ps1 -Mode Validate
 ```
 
-RC5 must not be promoted to 1.0.0 until this sequence succeeds from a virgin clone.
+The clean-room promotion sequence succeeded for 1.0.0. Repeat it in a separate
+empty checkout for a future release or collector-format change; never run Full
+against the migrated cumulative state.
 ## Offline permanent-master planning
 
 Run `python master/audit-permanent-masters.py --state work/state --out-dir work/logs/permanent-master-pr01`

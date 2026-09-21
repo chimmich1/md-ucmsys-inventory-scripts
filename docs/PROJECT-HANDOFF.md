@@ -2,9 +2,9 @@
 
 ## Active next steps
 
-PR-07 implementation merged as GitHub PR 9. PR-08 is the final release-promotion
-step; its review-first plan is in `PR-08-RELEASE-PROMOTION-PLAN.md` on branch
-`plan/pr08-release-promotion`. Merge that plan before changing `VERSION`.
+PR-07 implementation and the PR-08 review-first plan are merged. PR-08 release
+promotion is implemented on `feat/release-1.0.0`; review and merge its pull request
+before creating a tag or GitHub release.
 
 Current status (supersedes the older PR-05 notes retained below): PR-01 through
 PR-06 are merged. The reviewed PR-07 plan is merged as GitHub PR 8; implementation
@@ -36,7 +36,7 @@ All 69 tests and read-only legacy Validate pass. The revised real snapshot
 `02497c227cc9cc7fb008ede8` and its
 12-item assessment are under ignored `work/logs/pr05-*`; runtime state was not
 migrated and no provider calls were made. After review/merge, PR-06 must run migrated
-and clean-room acceptance before any 1.0.0 promotion.
+and clean-room acceptance before the PR-08 promotion.
 
 The offline PR-05 plan contains 19 Princess configuration jobs but only 25 exact
 deck requests, with no full scans and no Celebrity jobs. This plan was not executed.
@@ -57,7 +57,8 @@ stabilization baseline.
 
 ## Current source
 
-- Stabilization release: `1.0.0-rc5-hotfix3`.
+- Stabilization release promoted to `1.0.0` by PR-08; the RC5 history remains in
+  the changelog for provenance.
 - Starting Git baseline: `776cbfe` (portable RC5 incremental pipeline), clean
   `main` working tree before this stabilization work.
 - Source and migrated runtime state are now in the main checkout. The separate
