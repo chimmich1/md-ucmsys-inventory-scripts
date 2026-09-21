@@ -35,6 +35,8 @@
 - Invoke the root script for operational runs so output is automatically copied to
   a timestamped `work/logs` file. Do not reintroduce `Write-Progress`; progress and
   request summaries must be durable log lines.
+- Preserve the root logger's ISO 8601 local-time prefix, including its UTC offset, on every emitted line. New logging
+  paths must provide equivalent timestamps so request and stage slowness is auditable.
 - Run `python -m pytest tests -q` after behavioral changes. It includes both legacy
   registry script regressions. Run the root pipeline's Validate on migrated state
   when available, and report skipped checks or limitations accurately.

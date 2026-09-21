@@ -113,9 +113,12 @@ interrupted collection, use `-Mode Daily -ResumeAtCelebrityMasters`; version cha
 create a new checkpoint key, so do not assume old-version checkpoints will apply.
 Do not add `-RestartRun` unless intentionally discarding current-run checkpoints.
 
-No live Full/Daily provider collection is part of this stabilization. Before 1.0.0,
-run the documented Full/Validate/Daily/Validate release acceptance sequence in a
-separate empty checkout. The preserved main state must not be used for that test.
+PR-06 acceptance used a separate clean checkout. Full completed with 32 Celebrity
+and 30 Princess configurations; reuse-mode Daily and final Validate passed against
+snapshot `fd3ba17bd21cd53aecee93ec`. A fresh Celebrity acquisition can still fail
+closed at the pagination boundary when the provider reports 610 groups but returns
+609 unique groups; the previous valid raw artifact is preserved and must not be
+silently replaced by incomplete data.
 Multi-file master promotion is still not one atomic filesystem transaction;
 reconciliation addresses a completed promotion followed by interrupted catalog
 publication, not arbitrary corruption or every possible partial-file promotion.

@@ -20,6 +20,24 @@ def ship_code(voyage):
     return str(ship.get("providerId") or voyage.get("shipCode") or "").strip()
 
 
+def merge_targeted_decks(baseline, targeted):
+    """Replace probed decks while preserving every unprobed published deck."""
+    merged = dict(targeted)
+    decks = {str(deck["deckCode"]): deck for deck in baseline.get("decks", [])}
+    decks.update({str(deck["deckCode"]): deck for deck in targeted.get("decks", [])})
+    merged["decks"] = [decks[key] for key in sorted(decks, key=lambda value: int(value))]
+    discovery = dict(targeted.get("deckDiscovery") or {})
+    targeted_codes = {str(deck["deckCode"]) for deck in targeted.get("decks", [])}
+    discovery["preservedDeckCodes"] = sorted(
+        (str(deck["deckCode"]) for deck in baseline.get("decks", [])
+         if str(deck["deckCode"]) not in targeted_codes), key=int)
+    merged["deckDiscovery"] = discovery
+    merged["fingerprint"] = hashlib.sha256(
+        json.dumps(merged["decks"], sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()
+    return merged
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--mode", choices=["Full", "Daily"], required=True)
@@ -70,6 +88,7 @@ def main():
         else:
             final.parent.mkdir(parents=True, exist_ok=True)
             temporary = final.with_suffix(".json.partial")
+            baseline = json.loads(final.read_text(encoding="utf-8-sig")) if final.exists() else None
             command = [
                     a.python,
                     str(root / "providers/princess/published-deck-collector.py"),
@@ -81,6 +100,9 @@ def main():
             if selected_decks:
                 command.extend(["--decks", ",".join(map(str, selected_decks))])
             subprocess.run(command, check=True)
+            if selected_decks and baseline is not None:
+                dump(temporary, merge_targeted_decks(
+                    baseline, json.loads(temporary.read_text(encoding="utf-8-sig"))))
             temporary.replace(final)
             built += 1
 

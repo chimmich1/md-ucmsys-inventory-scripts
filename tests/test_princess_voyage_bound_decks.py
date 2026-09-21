@@ -125,3 +125,18 @@ def test_daily_catalog_preserves_historical_configuration_absent_from_current_vo
     catalog = json.loads(catalog_path.read_text())
     assert {(x["shipCode"], x["configurationId"]) for x in catalog["configurations"]} == {
         ("AP", "4"), ("OLD", "1")}
+
+
+def test_targeted_deck_merge_preserves_every_unprobed_deck():
+    baseline = {"decks": [
+        {"deckCode": "8", "response": {"cabins": [{"number": "E1", "old": True}]}},
+        {"deckCode": "9", "response": {"cabins": [{"number": "D1"}]}},
+    ]}
+    targeted = {"provider": "PRINCESS", "deckDiscovery": {"exactProbes": [8]}, "decks": [
+        {"deckCode": "8", "response": {"cabins": [{"number": "E1", "old": False}]}}
+    ]}
+    merged = BUILDER.merge_targeted_decks(baseline, targeted)
+    assert [x["deckCode"] for x in merged["decks"]] == ["8", "9"]
+    assert merged["decks"][0]["response"]["cabins"][0]["old"] is False
+    assert merged["deckDiscovery"]["preservedDeckCodes"] == ["9"]
+    assert merged["fingerprint"]

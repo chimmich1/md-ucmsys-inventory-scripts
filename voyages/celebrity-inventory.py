@@ -129,6 +129,16 @@ def fetch_page(session, page_number, skip):
     )
 
 
+def merge_unique_groups(existing, additions):
+    """Append groups while preserving the first occurrence of each provider ID."""
+    seen = {str(item.get("id") or "") for item in existing}
+    for item in additions:
+        group_id = str(item.get("id") or "")
+        if group_id and group_id not in seen:
+            existing.append(item)
+            seen.add(group_id)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--out", default="celebrity-voyages-raw.json")
@@ -143,12 +153,38 @@ def main():
         print(f"WARNING: Celebrity session bootstrap failed: {exc}", flush=True)
 
     all_cruises = []
+    short_pages = []
     expected_total = None
     skip = 0
     page_number = 0
     while expected_total is None or len(all_cruises) < expected_total:
         page_number += 1
-        cruises, reported_total = fetch_page(session, page_number, skip)
+        try:
+            cruises, reported_total = fetch_page(session, page_number, skip)
+        except RuntimeError as exc:
+            if short_pages and "empty cruise page" in str(exc):
+                # A short non-terminal page can leave one group outside the
+                # provider's fixed-offset window. Probe just after that short
+                # page and merge only previously unseen group IDs.
+                for short_skip, short_count in short_pages:
+                    boundary = short_skip + short_count
+                    for recovery_skip in range(max(0, boundary - 2), boundary + 2):
+                        try:
+                            recovered, recovery_total = fetch_page(
+                                session, page_number, recovery_skip
+                            )
+                        except RuntimeError:
+                            continue
+                        if recovery_total != expected_total:
+                            continue
+                        merge_unique_groups(all_cruises, recovered)
+                        if len(all_cruises) >= expected_total:
+                            break
+                    if len(all_cruises) >= expected_total:
+                        break
+                if len(all_cruises) >= expected_total:
+                    break
+            raise
         if expected_total is None:
             expected_total = reported_total
         elif reported_total != expected_total:
@@ -162,6 +198,8 @@ def main():
             f"accumulated={len(all_cruises)}/{expected_total}",
             flush=True,
         )
+        if len(cruises) < PAGE_SIZE and skip + PAGE_SIZE < expected_total:
+            short_pages.append((skip, len(cruises)))
         skip += PAGE_SIZE
 
     if len(all_cruises) != expected_total:

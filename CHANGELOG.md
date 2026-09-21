@@ -61,6 +61,17 @@
 - Hash physical, category, and assignment evidence independently so a commercial-
   only update does not change the physical revision identity.
 
+## Unreleased — release acceptance PR-06
+
+- Complete clean-room Full, reuse-mode Daily, and final Validate acceptance for
+  snapshot `fd3ba17bd21cd53aecee93ec`; 70 tests pass.
+- Document the Celebrity provider pagination inconsistency and fail-closed
+  preservation of the previous valid raw artifact.
+
+- Prefix every future root console/log line with an ISO 8601 local receipt timestamp including its UTC offset
+- Advance Celebrity pagination by the number of groups actually returned so a short non-terminal page cannot skip a group.
+  so provider request cadence, stage duration, warnings, and failures are auditable.
+
 ## 1.0.0-rc5-hotfix3
 
 - Reconcile every existing Celebrity catalog entry against its local published
