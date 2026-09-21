@@ -63,7 +63,8 @@ cabin-category assignment belong to static configuration masters; availability,
 rooms-left, fare selectors, promotions, taxes, and prices belong to the separate
 voyage/fare observation layer. PR-09 will use that v1.1 vocabulary and its
 provenance/resolution rules when linking dynamic observations to static masters.
-It will not copy the archive wholesale or duplicate its static-master schema.
+It will not copy the archive wholesale or duplicate its static-master schema. All dynamic acquisition in this sequence is JSON/API-only: no browser automation, DOM scraping, or rendered-page scraping. The production target is complete ship-wide availability with associated category pricing; exact-cabin checkout evidence remains additional provenance where the JSON API supplies it.
 The archived mapping also records that Celebrity exact-cabin physical facts are
 currently less resolved than Princess facts; unknowns must remain unknown.
+
 
