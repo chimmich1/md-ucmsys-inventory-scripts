@@ -2,6 +2,10 @@
 
 ## Active next steps
 
+PR-07 implementation merged as GitHub PR 9. PR-08 is the final release-promotion
+step; its review-first plan is in `PR-08-RELEASE-PROMOTION-PLAN.md` on branch
+`plan/pr08-release-promotion`. Merge that plan before changing `VERSION`.
+
 Current status (supersedes the older PR-05 notes retained below): PR-01 through
 PR-06 are merged. The reviewed PR-07 plan is merged as GitHub PR 8; implementation
 is on `feat/pr07-class-aware-discovery`. It adds an offline class-aware plan,
