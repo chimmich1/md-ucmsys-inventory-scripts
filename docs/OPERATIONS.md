@@ -188,3 +188,38 @@ python .\master\assess-permanent-masters.py `
 Periodic intervals are policy values, not inferred change dates. Migrated evidence
 has no supported `verifiedAt`, so its schedule is `UNSCHEDULED`; operators must not
 invent dates from file timestamps. PR-04 emits work but does not call providers.
+
+## Daily maintenance integration
+
+Daily materializes an active snapshot from local legacy masters if necessary, then
+runs `maintain-permanent-masters.py`. It compares locally known configurations with
+snapshot sources and processes only the targeted queue. Existing Princess work
+probes only known affected decks; a new configuration is bounded to decks 1–20.
+Celebrity work is restricted to selected
+configurations and uses new voyages first; verification without new voyages uses at
+most one eligible prior voyage. Historical Princess configurations remain catalogued
+even when absent from the current voyage feed.
+
+Preview exact jobs without provider calls or state changes:
+
+```powershell
+python .\master\plan-permanent-maintenance.py `
+  --snapshot-root .\work\state\static-masters\permanent-masters `
+  --registry .\work\state\fleet-physical-configuration-registry-v1.2.json `
+  --princess-voyages .\work\data\cruise-voyages-princess-v3.1.json `
+  --out .\work\logs\permanent-master-plan.json
+```
+
+If targeted collection fails, the active snapshot remains unchanged and the stage
+checkpoint is not written. Resume the same Daily after correcting the failure. If a
+successful collection does not resolve a work item, it is recorded in
+`static-masters/permanent-masters/maintenance-state.json` and is not called again
+for the same snapshot and policy. To retry all stalled items deliberately:
+
+```powershell
+python .\master\maintain-permanent-masters.py <normal arguments> --retry-stalled
+```
+
+The pipeline supplies the normal arguments automatically. Use the direct command
+only for diagnosis or an explicit retry. Full still performs bootstrap collection,
+then publishes and assesses the permanent snapshot.

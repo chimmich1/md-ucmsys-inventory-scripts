@@ -78,6 +78,12 @@ condition. Category definitions remain unverified without an independent closed 
 Assignments may be complete for each observed source configuration even while
 membership remains unverified.
 
+Source hashes are scoped to the document namespace. Physical sources hash normalized
+physical observations; category sources hash definitions; assignment sources hash
+assignment maps. The original combined legacy file is still verified against its
+catalog before extraction. An unchanged namespace keeps its revision identity when
+another namespace changes.
+
 PR-01's `migration-audit.json` is a separate report, schema version 1.0. It contains
 source identities/hashes, observed ship membership, field-sharing candidates,
 conflicting field values, category variants, and assignment comparisons. Its

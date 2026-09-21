@@ -128,6 +128,12 @@ def test_verified_prior_snapshot_can_be_reactivated_for_rollback(tmp_path):
     write(catalog_path, catalog)
     second_id, second_documents = snapshot.build_documents(state, classes, ROOT)
     assert second_id != first_id
+    assert (second_documents["celebrity-physical.json"]["revisionId"] ==
+            first_documents["celebrity-physical.json"]["revisionId"])
+    assert (second_documents["celebrity-categories.json"]["revisionId"] ==
+            first_documents["celebrity-categories.json"]["revisionId"])
+    assert (second_documents["celebrity-assignments.json"]["revisionId"] !=
+            first_documents["celebrity-assignments.json"]["revisionId"])
     snapshot.publish(output, second_id, second_documents)
     assert snapshot.validate_active(output)["snapshotId"] == second_id
 

@@ -193,6 +193,26 @@ Step "Archive + append Celebrity evidence registry" {
   Write-Host "Using completed canonical voyages and Celebrity static-master state." -ForegroundColor DarkGray
 }
 
+  $PermanentRoot=Join-Path $StateDir "static-masters\permanent-masters"
+  $PermanentActive=Join-Path $PermanentRoot "active-snapshot.json"
+
+if($Mode -eq "Daily"){
+  if(!(Test-Path $PermanentActive)){
+    Step "Bootstrap permanent masters from local evidence" {
+      Invoke-NativeCommand -Executable $Python -Arguments @(
+        (Join-Path $RepoRoot "master\materialize-permanent-masters.py"),
+        "--state", $StateDir)
+    }
+  }
+  Step "Permanent master targeted maintenance" {
+    Invoke-NativeCommand -Executable $Python -Arguments @(
+      (Join-Path $RepoRoot "master\maintain-permanent-masters.py"),
+      "--state", $StateDir, "--data", $DataDir,
+      "--celebrity-voyages", $Celebrity, "--princess-voyages", $Princess,
+      "--registry", $Registry, "--python", $Python,
+      "--out", (Join-Path $RunDir "permanent-master-maintenance.json"))
+  }
+} else {
 if(!$ResumeAtPrincessMasters){
 Step "Celebrity static cabin/category masters" {
   Invoke-NativeCommand -Executable $Python -Arguments @(
@@ -206,6 +226,16 @@ Step "Princess published static masters" {
   Invoke-NativeCommand -Executable $Python -Arguments @(
     (Join-Path $RepoRoot "master\build-princess-published-masters.py"), "--mode", $Mode,
     "--voyages", $Princess, "--state", $StateDir, "--python", $Python)
+}
+Step "Publish permanent master snapshot" {
+  Invoke-NativeCommand -Executable $Python -Arguments @(
+    (Join-Path $RepoRoot "master\materialize-permanent-masters.py"),
+    "--state", $StateDir)
+  Invoke-NativeCommand -Executable $Python -Arguments @(
+    (Join-Path $RepoRoot "master\assess-permanent-masters.py"),
+    "--snapshot-root", $PermanentRoot,
+    "--out", (Join-Path $RunDir "permanent-master-assessment.json"))
+}
 }
 
 Step "Validate generated masters" {

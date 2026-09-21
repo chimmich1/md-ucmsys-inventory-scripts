@@ -9,6 +9,10 @@
 - Do not treat legacy saturation, no-growth sampling, or a file timestamp as a
   completeness proof. Stalled fields stay outside automatic refresh unless an
   operator, factory refresh, or changed evidence/policy explicitly requeues them.
+- Daily permanent-master maintenance must process explicit source/configuration jobs
+  only. Preserve the active snapshot on collection failure and retain historical
+  catalog entries. No-progress work is stalled after one attempt for that snapshot
+  and policy; never bypass this by restoring broad voyage-wide cabin discovery.
 - Read README.md, VERSION, CHANGELOG.md, docs/PROJECT-HANDOFF.md, and relevant
   documentation before changes. Inspect Git status and history; preserve user edits.
 - `work/state` and `work/data` are required cumulative runtime state, not disposable

@@ -42,6 +42,28 @@ def _has_value(provider, ship, cabin, field, defaults, exceptions):
     return any(source.split("/")[1] == ship for source in default.get("sourceIds", []))
 
 
+def _effective_value(ship, cabin, field, defaults, exceptions):
+    exception = exceptions.get((ship, cabin, field))
+    if exception is not None:
+        return exception.get("value")
+    default = defaults.get((cabin, field))
+    if default and any(source.split("/")[1] == ship for source in default.get("sourceIds", [])):
+        return default.get("value")
+    return None
+
+
+def _relevant_sources(ship, cabin, field, defaults, exceptions, source_membership):
+    exception = exceptions.get((ship, cabin, field))
+    if exception and "observations" in exception:
+        return sorted({source for value in exception["observations"] for source in value["sourceIds"]})
+    default = defaults.get((cabin, field))
+    if default:
+        return sorted({source for source in default.get("sourceIds", []) + default.get("unknownSourceIds", [])
+                       if source.split("/")[1] == ship})
+    return sorted(m["sourceId"] for m in source_membership
+                  if m["sourceId"].split("/")[1] == ship and cabin in m["cabinNumbers"])
+
+
 def assess(snapshot_root, policy_path, manual_targets=(), factory_refresh_targets=()):
     snapshot_root, policy_path = Path(snapshot_root), Path(policy_path)
     manifest = validate_active(snapshot_root)
@@ -80,16 +102,28 @@ def assess(snapshot_root, policy_path, manual_targets=(), factory_refresh_target
                               if (ship, c, field) not in conflict_keys and
                               not _has_value(provider, ship, c, field, defaults, exceptions)]
                     if cabins:
+                        source_ids = sorted({source for cabin in cabins for source in
+                            _relevant_sources(ship, cabin, field, defaults, exceptions, group["sourceMembership"])})
+                        deck_numbers = sorted({deck for cabin in cabins for deck in
+                            [_effective_value(ship, cabin, "deckNumber", defaults, exceptions)]
+                            if isinstance(deck, int)})
                         missing[(ship, field)] = cabins
                         queue.append({"provider": provider, "groupId": group["groupId"],
                             "shipCode": ship, "dimension": "attributes", "action": "DISCOVER_MISSING_FIELD",
                             "field": field, "cabinCount": len(cabins), "cabinExamples": cabins[:10],
+                            "sourceIds": source_ids,
+                            "deckNumbers": deck_numbers,
                             "reason": "required field is unknown for confirmed membership"})
             for conflict in group["conflicts"]:
+                source_ids = sorted({source for value in conflict["values"] for source in value["sourceIds"]})
+                deck = _effective_value(conflict["shipCode"], conflict["cabinNumber"],
+                                        "deckNumber", defaults, exceptions)
                 queue.append({"provider": provider, "groupId": group["groupId"],
                     "shipCode": conflict["shipCode"], "dimension": "attributes",
                     "action": "RESOLVE_CONTRADICTORY_EVIDENCE", "field": conflict["field"],
                     "cabinCount": 1, "cabinExamples": [conflict["cabinNumber"]],
+                    "sourceIds": source_ids,
+                    "deckNumbers": [deck] if isinstance(deck, int) else [],
                     "reason": "multiple known values remain unresolved"})
 
             assignment_gaps = []

@@ -81,3 +81,10 @@ python master/assess-permanent-masters.py `
 Use `--manual-target CELEBRITY/EG` or `--factory-refresh-target PRINCESS/SU`
 to add an explicit ship-level physical verification. Unsupported measurements are
 reported as discovery-stalled and are not automatically recollected.
+
+Daily now uses the active snapshot assessment. On an upgraded legacy installation,
+the first Daily materializes the snapshot locally before planning calls. Completed
+unchanged configurations issue no cabin-discovery requests. Missing facts and
+contradictions are grouped into exact ship/configuration jobs; a no-progress result
+is stalled after one attempt. Full remains the empty-installation bootstrap and
+publishes a snapshot after both legacy provider masters are built.

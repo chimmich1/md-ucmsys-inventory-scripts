@@ -43,9 +43,10 @@ def build_documents(state, classes_path, repo_root):
     for provider in ("CELEBRITY", "PRINCESS"):
         groups = [g for g in report["groups"] if g["provider"] == provider]
         source_ids = sorted(sid for g in groups for m in g["sourceMembership"] for sid in [m["sourceId"]])
-        sources = [{"sourceId": sid, "path": source_by_id[sid]["path"],
-                    "sha256": source_by_id[sid]["sha256"], "verifiedAt": None}
-                   for sid in sorted(set(source_ids))]
+        def sources_for(evidence_key):
+            return [{"sourceId": sid, "path": source_by_id[sid]["path"],
+                     "sha256": source_by_id[sid][evidence_key], "hashScope": evidence_key,
+                     "verifiedAt": None} for sid in sorted(set(source_ids))]
         coverage = {name: {"status": "UNVERIFIED", "evidence": None}
                     for name in ("membership", "attributes", "categoryDefinitions", "assignments")}
 
@@ -86,7 +87,8 @@ def build_documents(state, classes_path, repo_root):
                 "sourceMembership": group["sourceMembership"], "shipFields": ship_fields,
                 "conflicts": conflicts})
         physical = with_hash({"schemaVersion": "2.0", "kind": "PHYSICAL_CABIN_MASTER",
-                              "provider": provider, "revisionId": "pending", "sources": sources,
+                              "provider": provider, "revisionId": "pending",
+                              "sources": sources_for("physicalEvidenceSha256"),
                               "coverage": coverage, "groups": physical_groups})
 
         definitions = []
@@ -94,7 +96,8 @@ def build_documents(state, classes_path, repo_root):
             for entry in group["categoryDefinitions"]:
                 definitions.append({"groupId": group["groupId"], **entry})
         category = with_hash({"schemaVersion": "2.0", "kind": "CATEGORY_DEFINITION_MASTER",
-                              "provider": provider, "revisionId": "pending", "sources": sources,
+                              "provider": provider, "revisionId": "pending",
+                              "sources": sources_for("categoryEvidenceSha256"),
                               "coverage": coverage, "definitions": definitions})
 
         revisions = []
@@ -102,7 +105,8 @@ def build_documents(state, classes_path, repo_root):
             for revision in group["assignmentRevisions"]:
                 revisions.append({"groupId": group["groupId"], **revision})
         assignment = with_hash({"schemaVersion": "2.0", "kind": "CABIN_CATEGORY_ASSIGNMENT_MASTER",
-                                "provider": provider, "revisionId": "pending", "sources": sources,
+                                "provider": provider, "revisionId": "pending",
+                                "sources": sources_for("assignmentEvidenceSha256"),
                                 "coverage": coverage, "revisions": revisions})
         for name, document in (("physical", physical), ("categories", category), ("assignments", assignment)):
             revision = document["contentSha256"][:16]

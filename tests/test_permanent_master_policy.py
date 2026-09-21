@@ -68,6 +68,7 @@ def test_unknown_required_field_creates_targeted_ship_work(tmp_path):
     assert items[0]["shipCode"] == "AA"
     assert items[0]["field"] == "zones"
     assert items[0]["action"] == "DISCOVER_MISSING_FIELD"
+    assert items[0]["sourceIds"] == ["CELEBRITY/AA/1", "CELEBRITY/AA/2"]
 
 
 def test_ambiguous_intra_ship_value_is_flagged_not_selected(tmp_path):
