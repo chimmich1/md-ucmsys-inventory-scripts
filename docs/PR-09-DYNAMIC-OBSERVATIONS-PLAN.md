@@ -53,3 +53,17 @@ PR-09 does not infer cabin membership from sister ships, merge dynamic data into
 permanent physical masters, or implement the Princess cabin/pricing adapter.
 Pricing/availability remains observation data and is never treated as static
 cabin fact.
+## Existing universal model input
+
+The archive `D:\dev\github\_archives\universal-cruise-cabin-model-v1.1`
+contains the canonical physical-cabin model, provider mapping matrix, migration
+notes, and representative Celebrity/Princess examples. Its key boundary is
+preserved: physical cabin, accommodation, service tier, commercial category, and
+cabin-category assignment belong to static configuration masters; availability,
+rooms-left, fare selectors, promotions, taxes, and prices belong to the separate
+voyage/fare observation layer. PR-09 will use that v1.1 vocabulary and its
+provenance/resolution rules when linking dynamic observations to static masters.
+It will not copy the archive wholesale or duplicate its static-master schema.
+The archived mapping also records that Celebrity exact-cabin physical facts are
+currently less resolved than Princess facts; unknowns must remain unknown.
+
