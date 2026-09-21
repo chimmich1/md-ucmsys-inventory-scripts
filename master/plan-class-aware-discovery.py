@@ -35,6 +35,11 @@ def plan(snapshot_root, classes_path, assessment_path):
     files = Path(snapshot_root) / "snapshots" / manifest["snapshotId"]
     classes = class_index(classes_path)
     assessment = load(assessment_path)
+    if assessment.get("snapshotId") != manifest["snapshotId"]:
+        raise ValueError(
+            "assessment snapshot does not match active permanent-master snapshot: "
+            f"{assessment.get('snapshotId')} != {manifest['snapshotId']}"
+        )
     queued = {(item.get("provider"), item.get("shipCode"), item.get("dimension"))
               for item in assessment.get("refreshQueue", [])}
     rows = []

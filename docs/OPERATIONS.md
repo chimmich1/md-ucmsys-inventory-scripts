@@ -190,6 +190,21 @@ Periodic intervals are policy values, not inferred change dates. Migrated eviden
 has no supported `verifiedAt`, so its schedule is `UNSCHEDULED`; operators must not
 invent dates from file timestamps. PR-04 emits work but does not call providers.
 
+Create the class-aware discovery audit from that exact assessment:
+
+```powershell
+python .\master\plan-class-aware-discovery.py `
+  --snapshot-root .\work\state\static-masters\permanent-masters `
+  --assessment .\work\logs\permanent-master-assessment.json `
+  --out .\work\logs\class-aware-discovery-plan.json
+```
+
+This command is offline and writes only the selected report. It fails if the
+assessment belongs to a different active snapshot. Review `TARGET_QUEUED` and
+`SKIP_REUSED_EVIDENCE` counts by namespace before Daily. Class membership never
+creates unobserved cabin membership; ships absent from `config/ship-classes.json`
+use a ship-only group.
+
 ## Daily maintenance integration
 
 Daily materializes an active snapshot from local legacy masters if necessary, then
@@ -200,6 +215,8 @@ Celebrity work is restricted to selected
 configurations and uses new voyages first; verification without new voyages uses at
 most one eligible prior voyage. Historical Princess configurations remain catalogued
 even when absent from the current voyage feed.
+The maintenance report includes `classAwareDiscovery` rows and targeted/skipped
+counts by class, ship, configuration, and queued namespace.
 
 Preview exact jobs without provider calls or state changes:
 

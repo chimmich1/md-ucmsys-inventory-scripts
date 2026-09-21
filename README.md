@@ -90,3 +90,16 @@ unchanged configurations issue no cabin-discovery requests. Missing facts and
 contradictions are grouped into exact ship/configuration jobs; a no-progress result
 is stalled after one attempt. Full remains the empty-installation bootstrap and
 publishes a snapshot after both legacy provider masters are built.
+
+Generate a class-aware audit plan without provider calls or state changes:
+
+```powershell
+python master/plan-class-aware-discovery.py `
+  --snapshot-root work/state/static-masters/permanent-masters `
+  --assessment work/logs/permanent-master-assessment.json `
+  --out work/logs/class-aware-discovery-plan.json
+```
+
+The assessment must belong to the active snapshot. The report identifies queued
+physical or assignment work and records reuse skips for completed class/ship
+evidence and independent category definitions. Unmapped ships stay ship-specific.
