@@ -19,6 +19,11 @@ passed for snapshot `fd3ba17bd21cd53aecee93ec`; 70 tests pass. A fresh Celebrity
 pagination retry remains fail-closed because the provider reports 610 groups but
 returns 609 unique groups; the prior valid raw artifact is preserved.
 
+Next approved work: **PR-07, class-aware discovery planning**. The complete
+scope and acceptance contract is committed in
+`docs/PR-07-CLASS-AWARE-DISCOVERY-PLAN.md`; implementation must not begin until
+that plan is reviewed and merged.
+
 PR-05 verification: 69 tests and read-only legacy Validate pass. Mocked unchanged
 completed state plans and executes zero collector calls. Multiple items for one
 configuration collapse to one job; affected configurations collapse to one builder
@@ -90,6 +95,7 @@ gaps. Unmapped ships remain ship-specific until explicitly classified.
 | **PR-04** | Completion and refresh policy: independent coverage states, evidence-backed completeness checks, stalled discovery, manual refresh, periodic verification policy, and targeted discovery queue. | Unknown balcony size does not cause endless discovery; stalled is not complete; unchanged completed ships queue no physical calls; ambiguous evidence remains flagged. | Merged (GitHub PR 5) |
 | **PR-05** | Integrate both providers into maintenance-mode Daily and bootstrap Full. Use shared templates without assuming unobserved cabin membership; enrich missing facts; process only queued work; commercial changes update commercial masters independently. | Mocked request-count tests prove zero cabin discovery on unchanged completed masters and bounded requests for targeted changes. Resume/failure tests preserve cumulative state. | Merged (GitHub PR 6) |
 | **PR-06** | Release acceptance, operator commands, backup/restore and upgrade instructions, updated handoff, and final version promotion. Validate migrated state and monitored Daily; separately run clean-room Full/Validate/Daily/Validate. | 70 tests pass; clean Full, reuse-mode Daily, and final Validate pass; provider pagination limitation documented. | Ready for PR |
+| **PR-07** | Class-aware discovery planning and duplicate-call suppression using permanent physical, category, and assignment evidence. | Plan committed before implementation; unchanged sister ships make zero physical calls; new ships remain bounded; namespace-specific skips, restart, failure, and request-reduction reports pass. | Planned |
 
 Tests and documentation accompany every PR; PR-06 is not a reason to defer
 regression coverage. PR-02 is logically independent of the new schemas, but keep
