@@ -7,9 +7,10 @@ collected data, then maintain them through targeted discovery. Routine voyages
 must not trigger repeated discovery of established physical cabin facts.
 
 Current work: **PR-01, foundations and offline migration audit**.
-Branch: `feat/permanent-master-foundation`. GitHub PR link will be recorded here
-when opened. PR sequence numbers below are stable roadmap IDs, not GitHub issue
-numbers. Each PR depends on the preceding merged PR unless explicitly noted.
+Branch: `feat/permanent-master-foundation`. Draft GitHub PR:
+https://github.com/chimmich1/md-ucmsys-inventory-scripts/pull/2. PR sequence numbers
+below are stable roadmap IDs, not GitHub issue numbers. Each PR depends on the
+preceding merged PR unless explicitly noted.
 
 PR-01 implementation is ready for review: proposed contracts are documented in
 `PERMANENT-MASTER-CONTRACT.md`; serialization and active snapshot publication
