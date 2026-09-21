@@ -167,13 +167,19 @@ def main():
                 # provider's fixed-offset window. Probe just after that short
                 # page and merge only previously unseen group IDs.
                 for short_skip, short_count in short_pages:
-                    recovery_skip = short_skip + short_count
-                    recovered, recovery_total = fetch_page(
-                        session, page_number, recovery_skip
-                    )
-                    if recovery_total != expected_total:
-                        raise
-                    merge_unique_groups(all_cruises, recovered)
+                    boundary = short_skip + short_count
+                    for recovery_skip in range(max(0, boundary - 2), boundary + 2):
+                        try:
+                            recovered, recovery_total = fetch_page(
+                                session, page_number, recovery_skip
+                            )
+                        except RuntimeError:
+                            continue
+                        if recovery_total != expected_total:
+                            continue
+                        merge_unique_groups(all_cruises, recovered)
+                        if len(all_cruises) >= expected_total:
+                            break
                     if len(all_cruises) >= expected_total:
                         break
                 if len(all_cruises) >= expected_total:

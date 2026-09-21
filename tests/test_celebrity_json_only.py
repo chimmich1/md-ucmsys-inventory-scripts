@@ -62,7 +62,7 @@ class CelebrityJsonOnlyTests(unittest.TestCase):
         self.assertIn("MAX_ATTEMPTS = 4", source)
         self.assertIn("PAGE_SIZE = 100", source)
         self.assertIn("short_pages", source)
-        self.assertIn("recovery_skip = short_skip + short_count", source)
+        self.assertIn("boundary = short_skip + short_count", source)
         self.assertNotIn('"count": 1000', source)
         self.assertIn("pagination count mismatch", source)
         self.assertIn("duplicate cruise-group IDs", source)
