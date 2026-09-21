@@ -14,6 +14,36 @@ def load(path):
     return json.loads(Path(path).read_text(encoding="utf-8-sig"))
 
 
+def class_memberships(path):
+    document = load(path)
+    result = {}
+    for group in document.get("classes", []):
+        for ship in group.get("shipCodes", []):
+            result[(group["provider"], ship)] = group["classId"]
+    return result
+
+
+def class_aware_summary(plan, known, published, classes):
+    targeted = {job["sourceId"] for job in plan}
+    rows = []
+    for source in sorted(set(known) | set(published)):
+        provider, ship, configuration = source.split("/", 2)
+        job = next((item for item in plan if item["sourceId"] == source), None)
+        rows.append({"sourceId": source, "provider": provider,
+                     "classId": classes.get((provider, ship), f"ship:{ship}"),
+                     "shipCode": ship, "configurationId": configuration,
+                     "action": "TARGET" if source in targeted else "SKIP_REUSED_EVIDENCE",
+                     "dimensions": job["dimensions"] if job else [],
+                     "reason": "; ".join(job["reasons"]) if job else
+                               "active permanent evidence has no queued work"})
+    return {"rows": rows, "targetedSourceCount": len(targeted),
+            "skippedSourceCount": sum(row["action"] == "SKIP_REUSED_EVIDENCE" for row in rows),
+            "byClass": {class_id: {
+                "targeted": sum(row["classId"] == class_id and row["action"] == "TARGET" for row in rows),
+                "skipped": sum(row["classId"] == class_id and row["action"] == "SKIP_REUSED_EVIDENCE" for row in rows)}
+                for class_id in sorted({row["classId"] for row in rows})}}
+
+
 def known_sources(registry_path, princess_voyages_path):
     result = set()
     registry = load(registry_path)

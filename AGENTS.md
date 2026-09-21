@@ -13,6 +13,9 @@
   only. Preserve the active snapshot on collection failure and retain historical
   catalog entries. No-progress work is stalled after one attempt for that snapshot
   and policy; never bypass this by restoring broad voyage-wide cabin discovery.
+- Class-aware discovery plans must match the active snapshot assessment. Reuse
+  completed namespace evidence, retain ship-only fallback for unmapped ships, and
+  never infer unobserved cabin membership from a sister ship.
 - Read README.md, VERSION, CHANGELOG.md, docs/PROJECT-HANDOFF.md, and relevant
   documentation before changes. Inspect Git status and history; preserve user edits.
 - `work/state` and `work/data` are required cumulative runtime state, not disposable

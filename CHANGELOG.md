@@ -1,5 +1,19 @@
 # Changelog
 
+## Unreleased — class-aware discovery PR-07
+
+- Add an offline class-aware discovery plan derived from the active immutable
+  snapshot and its matching completion assessment.
+- Reuse completed physical, assignment, and category-definition evidence while
+  retaining ship-only fallback for unclassified ships; only queued namespaces are
+  targeted for provider collection.
+- Include class-aware targeted/skipped source counts in Daily maintenance reports.
+- Reject stale assessments whose snapshot ID does not match the active snapshot,
+  preserving restart safety and the active pointer.
+- Against migrated runtime state, 32 ship rows plan 10 targeted physical calls and
+  skip 86 already-covered namespace calls; the underlying assessment retains 12
+  work items (nine missing fields and three contradictions).
+
 ## Unreleased — permanent-master PR-01
 
 - Commit the six-PR implementation roadmap and proposed three-master contracts.

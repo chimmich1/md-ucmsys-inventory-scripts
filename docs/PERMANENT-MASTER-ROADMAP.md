@@ -6,9 +6,9 @@ Approved direction: build durable class templates and ship exceptions from the
 collected data, then maintain them through targeted discovery. Routine voyages
 must not trigger repeated discovery of established physical cabin facts.
 
-Current work: **PR-06, release acceptance**.
-Branch: `release/pr06-acceptance`. PR-01 through PR-05 are merged; this branch
-contains the final acceptance, logging, and pagination fixes.
+Current work: **PR-07, class-aware discovery implementation**.
+Branch: `feat/pr07-class-aware-discovery`. PR-01 through PR-06 and the separate
+PR-07 planning change are merged. This branch implements the reviewed plan.
 PR-04 merged as
 GitHub PR 5; PR-03 as GitHub PR 4; PR-02 as GitHub PR 3; PR-01 as GitHub PR 2.
 PR sequence numbers below are stable roadmap IDs, not GitHub issue numbers. Each
@@ -19,10 +19,17 @@ passed for snapshot `fd3ba17bd21cd53aecee93ec`; 70 tests pass. A fresh Celebrity
 pagination retry remains fail-closed because the provider reports 610 groups but
 returns 609 unique groups; the prior valid raw artifact is preserved.
 
-Next approved work: **PR-07, class-aware discovery planning**. The complete
-scope and acceptance contract is committed in
-`docs/PR-07-CLASS-AWARE-DISCOVERY-PLAN.md`; implementation must not begin until
-that plan is reviewed and merged.
+The reviewed scope and acceptance contract is committed in
+`docs/PR-07-CLASS-AWARE-DISCOVERY-PLAN.md`. Implementation now adds the offline
+class-aware plan, matching-snapshot guard, and Daily reuse reporting. The migrated
+runtime assessment contains 12 work items; they collapse to 10 targeted ship-level
+physical calls while 86 completed namespace calls are skipped across 32 ships.
+
+Verification: 73 tests pass and read-only Validate passes for 32 Celebrity and
+30 Princess configurations on snapshot `02497c227cc9cc7fb008ede8`.
+
+Next action: prepare the PR-07 implementation pull request. No live collection
+is required for this PR.
 
 PR-05 verification: 69 tests and read-only legacy Validate pass. Mocked unchanged
 completed state plans and executes zero collector calls. Multiple items for one
@@ -94,8 +101,8 @@ gaps. Unmapped ships remain ship-specific until explicitly classified.
 | **PR-03** | Materialize the new three-master structure from existing evidence; class defaults plus confirmed membership/field overrides; explicit revision/applicability records; independent physical/commercial identities; transactional snapshot publication, restart and rollback support. | Old/new confirmed facts reconcile; exceptions and unknowns retained; no destructive migration; interrupted publish leaves a consistent active snapshot; new and legacy readers validate. | Merged (GitHub PR 4) |
 | **PR-04** | Completion and refresh policy: independent coverage states, evidence-backed completeness checks, stalled discovery, manual refresh, periodic verification policy, and targeted discovery queue. | Unknown balcony size does not cause endless discovery; stalled is not complete; unchanged completed ships queue no physical calls; ambiguous evidence remains flagged. | Merged (GitHub PR 5) |
 | **PR-05** | Integrate both providers into maintenance-mode Daily and bootstrap Full. Use shared templates without assuming unobserved cabin membership; enrich missing facts; process only queued work; commercial changes update commercial masters independently. | Mocked request-count tests prove zero cabin discovery on unchanged completed masters and bounded requests for targeted changes. Resume/failure tests preserve cumulative state. | Merged (GitHub PR 6) |
-| **PR-06** | Release acceptance, operator commands, backup/restore and upgrade instructions, updated handoff, and final version promotion. Validate migrated state and monitored Daily; separately run clean-room Full/Validate/Daily/Validate. | 70 tests pass; clean Full, reuse-mode Daily, and final Validate pass; provider pagination limitation documented. | Ready for PR |
-| **PR-07** | Class-aware discovery planning and duplicate-call suppression using permanent physical, category, and assignment evidence. | Plan committed before implementation; unchanged sister ships make zero physical calls; new ships remain bounded; namespace-specific skips, restart, failure, and request-reduction reports pass. | Planned |
+| **PR-06** | Release acceptance, operator commands, backup/restore and upgrade instructions, updated handoff, and final version promotion. Validate migrated state and monitored Daily; separately run clean-room Full/Validate/Daily/Validate. | 70 tests pass; clean Full, reuse-mode Daily, and final Validate pass; provider pagination limitation documented. | Merged (GitHub PR 7) |
+| **PR-07** | Class-aware discovery planning and duplicate-call suppression using permanent physical, category, and assignment evidence. | Plan committed before implementation; unchanged sister ships make zero physical calls; new ships remain bounded; namespace-specific skips, restart, failure, and request-reduction reports pass. | Implementation in progress; planning merged as GitHub PR 8 |
 
 Tests and documentation accompany every PR; PR-06 is not a reason to defer
 regression coverage. PR-02 is logically independent of the new schemas, but keep

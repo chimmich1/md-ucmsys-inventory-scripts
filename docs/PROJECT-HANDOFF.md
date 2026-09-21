@@ -2,6 +2,28 @@
 
 ## Active next steps
 
+Current status (supersedes the older PR-05 notes retained below): PR-01 through
+PR-06 are merged. The reviewed PR-07 plan is merged as GitHub PR 8; implementation
+is on `feat/pr07-class-aware-discovery`. It adds an offline class-aware plan,
+matching-snapshot restart protection, and class-aware Daily maintenance reporting
+while preserving exact queue-driven source/configuration execution.
+
+Against active snapshot `02497c227cc9cc7fb008ede8`, the offline assessment has
+12 items: nine missing fields and three contradictions. The class-aware plan covers
+32 ships, targets 10 ship-level physical calls, and skips 86 completed physical,
+assignment, or category-definition calls. Reports are ignored under
+`work/logs/pr07-*`; no providers were contacted and cumulative state was not changed.
+
+Next: run the full pytest suite and read-only Validate, then prepare the PR-07
+implementation pull request. Regenerate the assessment after any snapshot change;
+the planner rejects an assessment that does not match the active pointer.
+
+Verification completed on Python 3.14.7: **73 tests passed**. Root read-only
+Validate passed with 2,023 Princess voyages, 1,896 Celebrity voyages, 32 Celebrity
+configurations, 30 Princess configurations, and permanent snapshot
+`02497c227cc9cc7fb008ede8`. The timestamped validation log is
+`work/logs/pr07-class-aware-validate.log`.
+
 PR-01 through PR-04 merged as GitHub PRs 2–5. PR-05 is implemented on
 `feat/pr05-maintenance-integration`: queue-driven Daily, Full snapshot bootstrap,
 exact configuration filters, one-attempt no-progress stalling, historical Princess
@@ -120,9 +142,8 @@ closed at the pagination boundary when the provider reports 610 groups but retur
 609 unique groups; the previous valid raw artifact is preserved and must not be
 silently replaced by incomplete data.
 
-PR-07 is the next planned change. Read
+PR-07 implementation is the active change. Read
 `docs/PR-07-CLASS-AWARE-DISCOVERY-PLAN.md` before modifying collector behavior.
-The plan must be reviewed and merged as its own PR before implementation starts.
 Multi-file master promotion is still not one atomic filesystem transaction;
 reconciliation addresses a completed promotion followed by interrupted catalog
 publication, not arbitrary corruption or every possible partial-file promotion.

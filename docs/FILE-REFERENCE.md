@@ -22,6 +22,7 @@
 | `master/permanent_master_policy.py` | Applies required/stalled fields, proofs, conflicts, assignments, and explicit refresh triggers. | None (pure assessment) |
 | `master/maintain-permanent-masters.py` | Executes grouped Daily queue jobs, republishes changed snapshots, and records no-progress work. | Legacy target masters, permanent snapshot, maintenance report/state |
 | `master/plan-permanent-maintenance.py` | Previews exact Daily jobs without provider calls or state changes. | Caller-selected plan report |
+| `master/plan-class-aware-discovery.py` | Audits class/ship evidence reuse and queued namespaces against a matching active-snapshot assessment. | Caller-selected plan report |
 | `master/permanent_master_maintenance.py` | Pure planning plus bounded provider-builder orchestration. | Through explicitly invoked builders |
 | `config/permanent-master-refresh-policy.json` | Required fields, stalled fields, allowed triggers, and periodic verification intervals. | Policy input |
 | `master/permanent_master_snapshot.py` | Deterministic snapshot construction, publication, restart recovery, and validation. | Caller-selected snapshot root |
