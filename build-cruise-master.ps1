@@ -55,12 +55,12 @@ if ($RestartRun) {
 
 $logs = Join-Path $PSScriptRoot "work\logs"
 if (!$LogPath) {
-    $stamp = (Get-Date).ToUniversalTime().ToString("yyyyMMdd-HHmmss")
+    $stamp = [DateTimeOffset]::Now.ToString("yyyyMMdd-HHmmss")
     $LogPath = Join-Path $logs "$($Mode.ToLowerInvariant())-v$((Get-Content -Raw (Join-Path $PSScriptRoot 'VERSION')).Trim())-$stamp.log"
 }
 $logParent = Split-Path -Parent $LogPath
 New-Item -ItemType Directory -Force -Path $logParent | Out-Null
-Write-Host "[$((Get-Date).ToUniversalTime().ToString('o'))] Run log: $LogPath"
+Write-Host "[$([DateTimeOffset]::Now.ToString('o'))] Run log: $LogPath"
 
 $childArguments = @("-NoLogo", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", $script,
     "-Mode", $Mode, "-SurveyStart", $SurveyStart, "-Python", $Python)
@@ -78,7 +78,7 @@ try {
     & powershell.exe @childArguments 2>&1 |
         ForEach-Object {
             foreach ($line in ($_.ToString() -split "`r?`n")) {
-                "[$((Get-Date).ToUniversalTime().ToString('o'))] $line"
+                "[$([DateTimeOffset]::Now.ToString('o'))] $line"
             }
         } |
         Tee-Object -FilePath $LogPath

@@ -45,7 +45,7 @@ The path is printed before work starts. `-LogPath` selects a stable destination:
 The wrapper runs the pipeline in a child PowerShell process, drains stdout and
 stderr to both console and file, and only then returns the exit code. This keeps
 complete Python tracebacks under Windows PowerShell 5.1. Every emitted line is
-prefixed with an ISO 8601 UTC timestamp for duration and slowdown analysis. Stage completion/failure
+prefixed with an ISO 8601 local timestamp including its UTC offset for duration and slowdown analysis. Stage completion/failure
 includes elapsed seconds. Princess itinerary acquisition logs every 25th request
 and a final matched/fallback/failure summary; it does not use `Write-Progress`.
 Celebrity discovery separately labels failures added by the current run and older

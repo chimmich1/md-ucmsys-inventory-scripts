@@ -63,7 +63,7 @@
 
 ## Unreleased — release acceptance PR-06
 
-- Prefix every future root console/log line with an ISO 8601 UTC receipt timestamp
+- Prefix every future root console/log line with an ISO 8601 local receipt timestamp including its UTC offset
   so provider request cadence, stage duration, warnings, and failures are auditable.
 
 ## 1.0.0-rc5-hotfix3
