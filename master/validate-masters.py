@@ -2,6 +2,7 @@
 import argparse,json,hashlib
 from pathlib import Path
 from catalog_state import resolve_catalog_path as resolve_local_path
+from permanent_master_snapshot import validate_active
 ap=argparse.ArgumentParser();ap.add_argument('--state',required=True);a=ap.parse_args();root=Path(a.state)/'static-masters'; mf=root/'celebrity-manifest.json'; catalog=root/'celebrity-catalog.json'
 def resolve_catalog_path(value, provider, ship, configuration, filename):
  return resolve_local_path(root,value,provider,ship,configuration,filename)
@@ -50,3 +51,6 @@ for x in pc.get('configurations',[]):
    perrors.append(f'cabin count mismatch {p} deck={deck.get("deckCode")}')
 if perrors: raise SystemExit('\n'.join(perrors))
 print(f"Princess static masters valid: {len(pc.get('configurations',[]))} voyage-bound configurations")
+permanent_root=root/'permanent-masters'
+active=validate_active(permanent_root)
+if active: print(f"Permanent-master snapshot valid: {active['snapshotId']}")

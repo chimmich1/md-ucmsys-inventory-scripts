@@ -64,6 +64,12 @@ three masters and then atomically switch its active pointer. Readers must never
 mix snapshots. Restart must recover an interrupted publication without discarding
 prior state. Existing catalogs and raw evidence remain available during migration.
 
+PR-03 implements this as six documents, one physical/category/assignment set per
+provider. The manifest binds their canonical hashes and `active-snapshot.json`
+selects one manifest. It promotes and verifies the immutable directory before the
+pointer update. The initial migrated coverage states are all `UNVERIFIED`, and
+legacy catalogs remain authoritative until the later collector-integration PRs.
+
 PR-01's `migration-audit.json` is a separate report, schema version 1.0. It contains
 source identities/hashes, observed ship membership, field-sharing candidates,
 conflicting field values, category variants, and assignment comparisons. Its

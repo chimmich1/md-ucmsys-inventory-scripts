@@ -154,6 +154,7 @@ def audit(state, classes_path):
     for (provider, group_id), records in sorted(grouped.items()):
         records.sort(key=lambda record: record["sourceId"])
         facts = defaultdict(lambda: defaultdict(lambda: defaultdict(set)))
+        ship_facts = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: defaultdict(set))))
         membership = defaultdict(set)
         definition_variants = defaultdict(lambda: defaultdict(set))
         definition_values = {}
@@ -165,6 +166,7 @@ def audit(state, classes_path):
                 for field, values in fields.items():
                     for value in values:
                         facts[cabin][field][value].add(source_id)
+                        ship_facts[record["ship"]][cabin][field][value].add(source_id)
             for key, variants in record["definitions"].items():
                 for digest, value in variants.items():
                     definition_values[digest] = value
@@ -205,6 +207,15 @@ def audit(state, classes_path):
         groups.append({"provider": provider, "groupId": group_id,
             "scope": "SHIP_ONLY" if group_id.startswith("ship:") else "CLASS",
             "confirmedShipMembership": {ship: sorted(cabins) for ship, cabins in sorted(membership.items())},
+            "sourceMembership": [{"sourceId": record["sourceId"],
+                                  "cabinNumbers": sorted(record["physical"])} for record in records],
+            "shipFieldObservations": [{"shipCode": ship, "cabins": [
+                {"cabinNumber": cabin, "fields": [{"field": field, "values": [
+                    {"value": json.loads(value), "sourceIds": sorted(ids)}
+                    for value, ids in sorted(values.items())]}
+                    for field, values in sorted(fields.items())]}
+                for cabin, fields in sorted(cabins.items())]}
+                for ship, cabins in sorted(ship_facts.items())],
             "observedCabinUnion": len(facts), "proposedSharedFields": shared,
             "shipOnlyFieldCount": ship_only, "fieldsRequiringVariants": variants,
             "variantCountsByField": dict(sorted(Counter(v["field"] for v in variants).items())),
@@ -212,6 +223,13 @@ def audit(state, classes_path):
                 {"definition": definition_values[digest], "sourceIds": sorted(ids)}
                 for digest, ids in sorted(values.items())]} for key, values in sorted(definition_variants.items())],
             "identicalAssignmentMapGroups": [sorted(ids) for ids in assignment_maps.values() if len(ids) > 1],
+            "assignmentRevisions": [{"assignmentFingerprint": digest,
+                                     "sourceIds": sorted(assignment_maps[digest]),
+                                     "assignments": [{"cabinNumber": cabin, "categoryIdentities": values}
+                                                     for cabin, values in sorted(next(
+                                                         {c: sorted(v) for c, v in sorted(r["assignments"].items())}
+                                                         for r in records if r["sourceId"] in assignment_maps[digest]).items())]}
+                                    for digest in sorted(assignment_maps)],
             "assignmentVersionDifferences": version_differences})
 
     # Detect concurrent edits during the read. Audit never writes these inputs.

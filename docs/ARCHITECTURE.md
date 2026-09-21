@@ -2,6 +2,16 @@
 
 The system separates provider acquisition, canonical voyage normalization, configuration evidence, static ship masters, and later high-frequency availability/pricing observations.
 
+## Transactional permanent-master snapshots
+
+PR-03 adds an offline materializer under `master/materialize-permanent-masters.py`.
+It derives six independent revision documents from verified legacy catalog inputs.
+A manifest binds their hashes. Publication writes and verifies a staging directory,
+renames the complete directory to its immutable snapshot ID, then atomically writes
+one active pointer. An interruption before the pointer leaves the prior snapshot
+active; rerunning verifies the promoted directory and completes activation.
+Legacy catalogs and readers remain valid when no active pointer exists.
+
 ## Evidence rules
 
 - Future-only configuration discovery: `sailDate > surveyStartDate`; a voyage departing today is excluded.

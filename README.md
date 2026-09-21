@@ -58,3 +58,14 @@ python master/audit-permanent-masters.py --state work/state --out-dir work/logs/
 
 This reads the collected masters, verifies their catalog hashes, and writes JSON
 and Markdown reports. It makes no provider calls and publishes no masters.
+
+To materialize an immutable proposed snapshot from the same local evidence:
+
+```powershell
+python master/materialize-permanent-masters.py --state work/state
+```
+
+The command writes physical, category, and assignment documents for each provider,
+verifies and promotes their complete snapshot directory, then atomically switches
+`static-masters/permanent-masters/active-snapshot.json`. Legacy catalogs remain
+present and authoritative during this migration stage.

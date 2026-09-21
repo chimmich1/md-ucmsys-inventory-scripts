@@ -3,6 +3,9 @@
 - Active development plan: read `docs/PERMANENT-MASTER-ROADMAP.md` first and
   continue the numbered PR sequence. Update its status and next action before
   handoff. Local-only analysis/migration must not contact providers.
+- Permanent-master publication promotes and verifies a complete immutable snapshot
+  before atomically changing its active pointer. Preserve legacy catalogs during
+  migration; absence of an active snapshot must remain valid until integration.
 - Read README.md, VERSION, CHANGELOG.md, docs/PROJECT-HANDOFF.md, and relevant
   documentation before changes. Inspect Git status and history; preserve user edits.
 - `work/state` and `work/data` are required cumulative runtime state, not disposable

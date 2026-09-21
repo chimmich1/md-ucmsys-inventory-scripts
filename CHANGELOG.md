@@ -21,6 +21,19 @@
 - Report stage duration on success and failure, and distinguish current Celebrity
   API failures from failures retained in historical voyage evidence.
 
+## Unreleased — permanent-master snapshots PR-03
+
+- Materialize provider-specific physical, category-definition, and cabin-category
+  assignment revisions from catalogued local evidence without provider calls.
+- Store class field defaults, confirmed source/ship membership, compact ship
+  exceptions, unresolved conflicts, unknown coverage, and source hashes without
+  inferring effective dates or completeness.
+- Publish immutable multi-document snapshots transactionally: verify and promote
+  the complete directory before atomically switching the active pointer. Restart
+  completes an interruption without exposing mixed revisions.
+- Validate an active permanent-master snapshot when present while retaining full
+  compatibility with legacy-only state. Existing catalogs remain authoritative.
+
 ## 1.0.0-rc5-hotfix3
 
 - Reconcile every existing Celebrity catalog entry against its local published
