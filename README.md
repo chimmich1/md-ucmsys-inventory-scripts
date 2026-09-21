@@ -38,3 +38,6 @@ See `docs/OPERATIONS.md`, `docs/ARCHITECTURE.md`, and `docs/FILE-REFERENCE.md`.
 For development, install `pytest` and run `python -m pytest tests -q`. The suite
 includes the historical registry scripts; Windows stderr integration tests require
 Windows PowerShell 5.1. See `docs/PROJECT-HANDOFF.md` for the stabilization status.
+
+The approved permanent-master redesign and numbered PR sequence are in
+[docs/PERMANENT-MASTER-ROADMAP.md](docs/PERMANENT-MASTER-ROADMAP.md).

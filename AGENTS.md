@@ -1,5 +1,8 @@
 # Project instructions
 
+- Active development plan: read `docs/PERMANENT-MASTER-ROADMAP.md` first and
+  continue the numbered PR sequence. Update its status and next action before
+  handoff. Local-only analysis/migration must not contact providers.
 - Read README.md, VERSION, CHANGELOG.md, docs/PROJECT-HANDOFF.md, and relevant
   documentation before changes. Inspect Git status and history; preserve user edits.
 - `work/state` and `work/data` are required cumulative runtime state, not disposable
