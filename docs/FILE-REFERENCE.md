@@ -16,6 +16,9 @@
 | `master/build-static-masters.py` | Builds missing Celebrity masters, advances unsaturated configurations, and reconciles all catalog entries. | `work/state/static-masters` |
 | `master/catalog_state.py` | Local catalog path resolution, atomic JSON publishing, and metadata reconciliation. | Caller-selected catalogs |
 | `master/reconcile-catalogs.py` | Offline catalog recovery and relocation without collection. | Two catalogs and Celebrity manifest only |
+| `master/materialize-permanent-masters.py` | Builds and transactionally activates an immutable proposed permanent-master snapshot from local evidence. | `static-masters/permanent-masters` |
+| `master/activate-permanent-master-snapshot.py` | Verifies and atomically activates an existing snapshot for rollback. | Permanent-master active pointer |
+| `master/permanent_master_snapshot.py` | Deterministic snapshot construction, publication, restart recovery, and validation. | Caller-selected snapshot root |
 | `pipeline/invoke-native.ps1` | Preserves complete native stderr before checking exit codes. | No |
 | `master/providers/celebrity/configuration-discovery.py` | Configuration-aware Celebrity cabin/category saturation collector. | Caller-selected runtime directory |
 | `master/build-princess-published-masters.py` | Enumerates voyage-bound Princess ship/version configurations. | `work/state/static-masters` |

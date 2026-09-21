@@ -127,7 +127,7 @@ python -m pip install -r requirements.txt
 ```
 
 RC5 must not be promoted to 1.0.0 until this sequence succeeds from a virgin clone.
-# Offline permanent-master planning
+## Offline permanent-master planning
 
 Run `python master/audit-permanent-masters.py --state work/state --out-dir work/logs/permanent-master-pr01`
 to compare saved masters using `config/ship-classes.json`. Review both report files.
@@ -136,3 +136,28 @@ Conflicts and unknowns require explicit migration decisions. Legacy saturation
 does not establish completeness. Audit output must be outside state and data.
 PR-01 does not migrate state or change Daily. See `PERMANENT-MASTER-ROADMAP.md`
 for the remaining numbered PRs and `PERMANENT-MASTER-CONTRACT.md` for contracts.
+
+## Materialize a permanent-master snapshot
+
+Back up cumulative state before an intentional migration, then run:
+
+```powershell
+python .\master\materialize-permanent-masters.py --state .\work\state
+.\build-cruise-master.ps1 -Mode Validate
+```
+
+The materializer makes no provider calls and does not modify legacy catalogs,
+masters, raw evidence, registry, voyages, or checkpoints. It verifies every input
+catalog hash before deriving the snapshot. Complete immutable files are promoted
+before the active pointer changes. Rerunning is deterministic and safely completes
+an interruption between promotion and activation. Coverage remains unverified;
+legacy collectors continue using their existing catalogs in PR-03.
+
+To roll back the proposed snapshot pointer to a previously published immutable
+snapshot, use its manifest `snapshotId`:
+
+```powershell
+python .\master\activate-permanent-master-snapshot.py --state .\work\state --snapshot <snapshotId>
+```
+
+Activation verifies every document and manifest hash before changing the pointer.

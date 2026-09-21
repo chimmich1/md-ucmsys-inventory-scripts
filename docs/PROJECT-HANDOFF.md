@@ -2,13 +2,14 @@
 
 ## Active next steps
 
-PR-01 merged as GitHub PR 2. PR-02 is implemented on
-`fix/pr02-operational-logging`: automatic timestamped root logs, complete failure
-logs and exit codes, safe Git SHA capture, stage timing, Princess request counters,
-and current-versus-historical Celebrity failure labels. All 49 tests pass under
-Python 3.14/Windows PowerShell 5.1; read-only Validate passes all 62 masters and
-writes only its selected ignored log. No provider calls were made. After PR-02
-review/merge, continue PR-03 transactional three-master materialization.
+PR-01 and PR-02 merged as GitHub PRs 2 and 3. PR-03 is implemented on
+`feat/pr03-transactional-master-snapshots`: deterministic provider-specific
+physical/category/assignment documents, immutable manifest snapshots, atomic active
+pointer, interruption recovery, and optional validation alongside legacy catalogs.
+All 55 tests pass. The real evidence produced snapshot
+`2f9195b160259a2fd5c34edd` twice under ignored `work/logs/pr03-permanent-masters`;
+runtime state was not migrated and no provider calls were made. After review/merge,
+continue PR-04 independent completion states and targeted-refresh policy.
 
 The approved permanent-master redesign is tracked in
 [PERMANENT-MASTER-ROADMAP.md](PERMANENT-MASTER-ROADMAP.md). It defines six numbered
