@@ -6,9 +6,8 @@ Approved direction: build durable class templates and ship exceptions from the
 collected data, then maintain them through targeted discovery. Routine voyages
 must not trigger repeated discovery of established physical cabin facts.
 
-Current work: **PR-08, 1.0.0 release promotion**.
-PR-01 through PR-07 and the PR-08 release-promotion plan are merged. The release
-promotion implementation is on `feat/release-1.0.0`.
+Current work: **1.0.0 released**.
+PR-01 through PR-08 are merged. Main contains the promoted `1.0.0` release.
 PR-04 merged as
 GitHub PR 5; PR-03 as GitHub PR 4; PR-02 as GitHub PR 3; PR-01 as GitHub PR 2.
 PR sequence numbers below are stable roadmap IDs, not GitHub issue numbers. Each
@@ -28,8 +27,8 @@ physical calls while 86 completed namespace calls are skipped across 32 ships.
 Verification: 73 tests pass and read-only Validate passes for 32 Celebrity and
 30 Princess configurations on snapshot `02497c227cc9cc7fb008ede8`.
 
-Next action: review the release-promotion pull request, merge it, and create the
-1.0.0 tag or GitHub release only as a separate explicit release action.
+Next action: create the `1.0.0` tag or GitHub release only as a separate explicit
+release action. Routine maintenance continues through targeted Daily jobs.
 
 PR-05 verification: 69 tests and read-only legacy Validate pass. Mocked unchanged
 completed state plans and executes zero collector calls. Multiple items for one
@@ -103,7 +102,7 @@ gaps. Unmapped ships remain ship-specific until explicitly classified.
 | **PR-05** | Integrate both providers into maintenance-mode Daily and bootstrap Full. Use shared templates without assuming unobserved cabin membership; enrich missing facts; process only queued work; commercial changes update commercial masters independently. | Mocked request-count tests prove zero cabin discovery on unchanged completed masters and bounded requests for targeted changes. Resume/failure tests preserve cumulative state. | Merged (GitHub PR 6) |
 | **PR-06** | Release acceptance, operator commands, backup/restore and upgrade instructions, updated handoff, and final version promotion. Validate migrated state and monitored Daily; separately run clean-room Full/Validate/Daily/Validate. | 70 tests pass; clean Full, reuse-mode Daily, and final Validate pass; provider pagination limitation documented. | Merged (GitHub PR 7) |
 | **PR-07** | Class-aware discovery planning and duplicate-call suppression using permanent physical, category, and assignment evidence. | Plan committed before implementation; unchanged sister ships make zero physical calls; new ships remain bounded; namespace-specific skips, restart, failure, and request-reduction reports pass. | Merged (plan GitHub PR 8; implementation GitHub PR 9) |
-| **PR-08** | Promote the accepted collector to 1.0.0 and close the roadmap; no collection behavior changes. | Current-main tests and migrated-state read-only Validate pass; version and release documentation align; no provider calls or runtime migration. | Implementation complete; PR pending |
+| **PR-08** | Promote the accepted collector to 1.0.0 and close the roadmap; no collection behavior changes. | Current-main tests and migrated-state read-only Validate pass; version and release documentation align; no provider calls or runtime migration. | Merged (GitHub PR 11) |
 
 Tests and documentation accompany every PR; PR-06 is not a reason to defer
 regression coverage. PR-02 is logically independent of the new schemas, but keep

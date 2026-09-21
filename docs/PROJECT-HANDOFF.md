@@ -2,9 +2,8 @@
 
 ## Active next steps
 
-PR-07 implementation and the PR-08 review-first plan are merged. PR-08 release
-promotion is implemented on `feat/release-1.0.0`; review and merge its pull request
-before creating a tag or GitHub release.
+PR-07 implementation and PR-08 release promotion are merged. Main is now at
+`1.0.0`. Creating a tag or GitHub release remains a separate explicit action.
 
 Current status (supersedes the older PR-05 notes retained below): PR-01 through
 PR-06 are merged. The reviewed PR-07 plan is merged as GitHub PR 8; implementation
