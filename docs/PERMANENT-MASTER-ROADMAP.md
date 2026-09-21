@@ -1,4 +1,4 @@
-# Permanent master collector: release roadmap
+﻿# Permanent master collector: release roadmap
 
 ## Resume here
 
@@ -6,7 +6,7 @@ Approved direction: build durable class templates and ship exceptions from the
 collected data, then maintain them through targeted discovery. Routine voyages
 must not trigger repeated discovery of established physical cabin facts.
 
-Current work: **1.0.0 released**.
+Current work: **PR-09 dynamic universal inventory observations**. 1.0.0 remains released.
 PR-01 through PR-08 are merged. Main contains the promoted `1.0.0` release.
 PR-04 merged as
 GitHub PR 5; PR-03 as GitHub PR 4; PR-02 as GitHub PR 3; PR-01 as GitHub PR 2.
@@ -102,7 +102,7 @@ gaps. Unmapped ships remain ship-specific until explicitly classified.
 | **PR-05** | Integrate both providers into maintenance-mode Daily and bootstrap Full. Use shared templates without assuming unobserved cabin membership; enrich missing facts; process only queued work; commercial changes update commercial masters independently. | Mocked request-count tests prove zero cabin discovery on unchanged completed masters and bounded requests for targeted changes. Resume/failure tests preserve cumulative state. | Merged (GitHub PR 6) |
 | **PR-06** | Release acceptance, operator commands, backup/restore and upgrade instructions, updated handoff, and final version promotion. Validate migrated state and monitored Daily; separately run clean-room Full/Validate/Daily/Validate. | 70 tests pass; clean Full, reuse-mode Daily, and final Validate pass; provider pagination limitation documented. | Merged (GitHub PR 7) |
 | **PR-07** | Class-aware discovery planning and duplicate-call suppression using permanent physical, category, and assignment evidence. | Plan committed before implementation; unchanged sister ships make zero physical calls; new ships remain bounded; namespace-specific skips, restart, failure, and request-reduction reports pass. | Merged (plan GitHub PR 8; implementation GitHub PR 9) |
-| **PR-08** | Promote the accepted collector to 1.0.0 and close the roadmap; no collection behavior changes. | Current-main tests and migrated-state read-only Validate pass; version and release documentation align; no provider calls or runtime migration. | Merged (GitHub PR 11) |
+| **PR-08** | Promote the accepted collector to 1.0.0 and close the roadmap; no collection behavior changes. | Current-main tests and migrated-state read-only Validate pass; version and release documentation align; no provider calls or runtime migration. | Merged (GitHub PR 11) |\n| **PR-09** | Recover Celebrity dynamic availability/pricing observations into the universal inventory contract; add schema, compatibility importer, current collector, atomic output, and offline tests. | Archived observations convert deterministically; checkout/price provenance and partial deck coverage are retained; failed writes preserve prior output; existing tests and Validate pass; no runtime state rebuild or provider calls in tests. | Plan committed; implementation next |
 
 Tests and documentation accompany every PR; PR-06 is not a reason to defer
 regression coverage. PR-02 is logically independent of the new schemas, but keep
@@ -153,3 +153,4 @@ or incomplete coverage. Never silently choose a conflicting value as fact.
 - Before ending each implementation session, update this file's status, next
   action, branch/PR link, test results, and any unresolved decisions. Commit those
   updates with the work so a new session can resume without chat history.
+

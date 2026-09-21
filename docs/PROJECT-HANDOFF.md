@@ -1,60 +1,6 @@
-# Cruise-master project handoff
+﻿# Cruise-master project handoff
 
-## Active next steps
-
-PR-07 implementation and PR-08 release promotion are merged. Main is now at
-`1.0.0`. Creating a tag or GitHub release remains a separate explicit action.
-
-Current status (supersedes the older PR-05 notes retained below): PR-01 through
-PR-06 are merged. The reviewed PR-07 plan is merged as GitHub PR 8; implementation
-is on `feat/pr07-class-aware-discovery`. It adds an offline class-aware plan,
-matching-snapshot restart protection, and class-aware Daily maintenance reporting
-while preserving exact queue-driven source/configuration execution.
-
-Against active snapshot `02497c227cc9cc7fb008ede8`, the offline assessment has
-12 items: nine missing fields and three contradictions. The class-aware plan covers
-32 ships, targets 10 ship-level physical calls, and skips 86 completed physical,
-assignment, or category-definition calls. Reports are ignored under
-`work/logs/pr07-*`; no providers were contacted and cumulative state was not changed.
-
-Next: run the full pytest suite and read-only Validate, then prepare the PR-07
-implementation pull request. Regenerate the assessment after any snapshot change;
-the planner rejects an assessment that does not match the active pointer.
-
-Verification completed on Python 3.14.7: **73 tests passed**. Root read-only
-Validate passed with 2,023 Princess voyages, 1,896 Celebrity voyages, 32 Celebrity
-configurations, 30 Princess configurations, and permanent snapshot
-`02497c227cc9cc7fb008ede8`. The timestamped validation log is
-`work/logs/pr07-class-aware-validate.log`.
-
-PR-01 through PR-04 merged as GitHub PRs 2–5. PR-05 is implemented on
-`feat/pr05-maintenance-integration`: queue-driven Daily, Full snapshot bootstrap,
-exact configuration filters, one-attempt no-progress stalling, historical Princess
-retention, exact-deck Princess targeting, and namespace-independent revision hashes.
-All 69 tests and read-only legacy Validate pass. The revised real snapshot
-`02497c227cc9cc7fb008ede8` and its
-12-item assessment are under ignored `work/logs/pr05-*`; runtime state was not
-migrated and no provider calls were made. After review/merge, PR-06 must run migrated
-and clean-room acceptance before the PR-08 promotion.
-
-The offline PR-05 plan contains 19 Princess configuration jobs but only 25 exact
-deck requests, with no full scans and no Celebrity jobs. This plan was not executed.
-
-The approved permanent-master redesign is tracked in
-[PERMANENT-MASTER-ROADMAP.md](PERMANENT-MASTER-ROADMAP.md). It defines six numbered
-PRs, acceptance checks, data constraints, and the exact next action. Start there
-in a new session. PR-01 is the schema and offline migration audit; production
-collection remains RC5-hotfix3 until later integration PRs.
-
-After the stabilization described below, the first monitored Daily completed:
-2,023 Princess voyages, 1,896 Celebrity voyages, 16 Celebrity configurations
-advanced, 11 legacy-saturated masters, all 32 Celebrity and 30 Princess masters
-validated. Four registry voyages remain unproven and zero conflicts were recorded.
-The earlier Daily's UNKNOWN Git SHA was corrected in PR-02; its historical manifest
-is not rewritten. The verification and inventory sections below record the earlier
-stabilization baseline.
-
-## Current source
+## Active next steps`r`n`r`nPR-09 is the active next step: recover the archived Celebrity v1.5 dynamic availability/pricing adapter into a provider-neutral observation contract. The plan is committed in [PR-09-DYNAMIC-OBSERVATIONS-PLAN.md](PR-09-DYNAMIC-OBSERVATIONS-PLAN.md). The archived source remains outside the repository under `D:\dev\github\_archives\celebrity-cabin-adapter-v1.5`; do not modify or copy its 47 MB output into Git. First inspect and adapt the script, then add schemas, synthetic tests, and documentation. Princess dynamic cabin/pricing acquisition is a later bounded provider PR.`r`n`r`n## Current source
 
 - Stabilization release promoted to `1.0.0` by PR-08; the RC5 history remains in
   the changelog for provenance.
@@ -151,3 +97,5 @@ PR-07 implementation is the active change. Read
 Multi-file master promotion is still not one atomic filesystem transaction;
 reconciliation addresses a completed promotion followed by interrupted catalog
 publication, not arbitrary corruption or every possible partial-file promotion.
+
+
