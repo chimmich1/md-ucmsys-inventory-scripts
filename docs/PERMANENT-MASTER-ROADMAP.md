@@ -6,16 +6,18 @@ Approved direction: build durable class templates and ship exceptions from the
 collected data, then maintain them through targeted discovery. Routine voyages
 must not trigger repeated discovery of established physical cabin facts.
 
-Current work: **PR-05, maintenance-mode collector integration**.
-Branch: `feat/pr05-maintenance-integration`. Draft GitHub PR 6:
-https://github.com/chimmich1/md-ucmsys-inventory-scripts/pull/6. PR-04 merged as
+Current work: **PR-06, release acceptance**.
+Branch: `release/pr06-acceptance`. PR-01 through PR-05 are merged; this branch
+contains the final acceptance, logging, and pagination fixes.
+PR-04 merged as
 GitHub PR 5; PR-03 as GitHub PR 4; PR-02 as GitHub PR 3; PR-01 as GitHub PR 2.
 PR sequence numbers below are stable roadmap IDs, not GitHub issue numbers. Each
 PR depends on the preceding merged PR unless explicitly noted.
 
-PR-05 implementation is ready for review. Next action after merge: PR-06 performs
-migrated-state and clean-room release acceptance, operator documentation, measured
-request savings, and version promotion only if all acceptance runs succeed.
+PR-06 clean-room Full and reuse-mode Daily acceptance passed. Final Validate
+passed for snapshot `fd3ba17bd21cd53aecee93ec`; 70 tests pass. A fresh Celebrity
+pagination retry remains fail-closed because the provider reports 610 groups but
+returns 609 unique groups; the prior valid raw artifact is preserved.
 
 PR-05 verification: 69 tests and read-only legacy Validate pass. Mocked unchanged
 completed state plans and executes zero collector calls. Multiple items for one
@@ -86,8 +88,8 @@ gaps. Unmapped ships remain ship-specific until explicitly classified.
 | **PR-02** | Operational logging and provenance: fix PowerShell Git SHA early-pipeline termination; automatic timestamped run logs; replace progress bars with request counters; stage timing, retries, failure summaries, and current-vs-historical warnings. | PowerShell 5.1 tests for SHA capture, full stderr, progress reaching logs, failure exit codes, and read-only Validate. Test without live collection. | Merged (GitHub PR 3) |
 | **PR-03** | Materialize the new three-master structure from existing evidence; class defaults plus confirmed membership/field overrides; explicit revision/applicability records; independent physical/commercial identities; transactional snapshot publication, restart and rollback support. | Old/new confirmed facts reconcile; exceptions and unknowns retained; no destructive migration; interrupted publish leaves a consistent active snapshot; new and legacy readers validate. | Merged (GitHub PR 4) |
 | **PR-04** | Completion and refresh policy: independent coverage states, evidence-backed completeness checks, stalled discovery, manual refresh, periodic verification policy, and targeted discovery queue. | Unknown balcony size does not cause endless discovery; stalled is not complete; unchanged completed ships queue no physical calls; ambiguous evidence remains flagged. | Merged (GitHub PR 5) |
-| **PR-05** | Integrate both providers into maintenance-mode Daily and bootstrap Full. Use shared templates without assuming unobserved cabin membership; enrich missing facts; process only queued work; commercial changes update commercial masters independently. | Mocked request-count tests prove zero cabin discovery on unchanged completed masters and bounded requests for targeted changes. Resume/failure tests preserve cumulative state. | Ready for review |
-| **PR-06** | Release acceptance, operator commands, backup/restore and upgrade instructions, updated handoff, and final version promotion. Validate migrated state and monitored Daily; separately run clean-room Full/Validate/Daily/Validate. | Tests and both installation paths pass; request savings and unresolved gaps documented; no 1.0.0 claim until acceptance evidence exists. | Planned |
+| **PR-05** | Integrate both providers into maintenance-mode Daily and bootstrap Full. Use shared templates without assuming unobserved cabin membership; enrich missing facts; process only queued work; commercial changes update commercial masters independently. | Mocked request-count tests prove zero cabin discovery on unchanged completed masters and bounded requests for targeted changes. Resume/failure tests preserve cumulative state. | Merged (GitHub PR 6) |
+| **PR-06** | Release acceptance, operator commands, backup/restore and upgrade instructions, updated handoff, and final version promotion. Validate migrated state and monitored Daily; separately run clean-room Full/Validate/Daily/Validate. | 70 tests pass; clean Full, reuse-mode Daily, and final Validate pass; provider pagination limitation documented. | Ready for PR |
 
 Tests and documentation accompany every PR; PR-06 is not a reason to defer
 regression coverage. PR-02 is logically independent of the new schemas, but keep
