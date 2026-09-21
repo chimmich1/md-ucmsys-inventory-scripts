@@ -9,6 +9,9 @@
   and class-aware discovery reuse from the RC5 implementation series.
 - Preserve fail-closed behavior when Celebrity reports an incomplete pagination
   result; the prior validated artifact remains active.
+- Add a complete operator guide and Draft 2020-12 consumer schemas for canonical
+  voyages, the physical-configuration registry, catalogs, snapshot metadata, and
+  physical/category/assignment permanent masters.
 
 The following PR sections record the implementation history for this release.
 

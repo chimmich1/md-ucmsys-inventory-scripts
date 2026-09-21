@@ -39,7 +39,9 @@ python -m pip install -r requirements.txt
 
 Celebrity physical configurations are proven from sailing-specific room-selection JSON. Princess physical configurations are keyed by the provider ship version attached to each acquired voyage; no current-page version is projected onto unrelated sailings.
 
-See `docs/OPERATIONS.md`, `docs/ARCHITECTURE.md`, and `docs/FILE-REFERENCE.md`.
+See `docs/USER-GUIDE.md` for the complete operator guide, `docs/OPERATIONS.md`,
+`docs/ARCHITECTURE.md`, and `docs/FILE-REFERENCE.md` for detailed design and
+file references.
 
 For development, install `pytest` and run `python -m pytest tests -q`. The suite
 includes the historical registry scripts; Windows stderr integration tests require
