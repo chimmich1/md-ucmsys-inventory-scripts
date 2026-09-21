@@ -11,3 +11,6 @@ Use it only as an explicit observation job after selecting a voyage and output
 folder. Tests use the converter and synthetic fixtures instead of contacting the
 provider.
 
+
+Use -RequireCompleteInventory for production jobs that must fail closed when any advertised deck was not returned by the provider API. Do not publish that run as a complete ship observation when the switch fails.
+

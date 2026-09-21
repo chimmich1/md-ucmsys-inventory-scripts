@@ -816,3 +816,4 @@ if ($observations.Count -eq 0) {
     Write-Warning "No physical cabin objects were detected. Inspect the saved room-location RSC files."
 }
 
+
