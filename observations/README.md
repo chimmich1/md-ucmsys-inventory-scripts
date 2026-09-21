@@ -11,3 +11,5 @@ Use it only as an explicit observation job after selecting a voyage and output
 folder. Tests use the converter and synthetic fixtures instead of contacting the
 provider.
 
+
+For JSON-only full-ship jobs, deck_codes_from_master.py extracts the known deck selector values from the active published physical master. The collector should query those values through the provider's JSON request envelope and fail closed if any requested deck is not returned.
