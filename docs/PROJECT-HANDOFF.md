@@ -1,5 +1,26 @@
 # Cruise-master project handoff
 
+## Active next steps
+
+PR-01 is implemented on `feat/permanent-master-foundation`: proposed contracts,
+class configuration, and offline audit. All 44 tests pass; existing Validate
+passes all 62 masters. The deterministic report is in ignored
+`work/logs/permanent-master-pr01`. No production migration or provider calls were
+performed. After review/merge, continue PR-02 (durable logging and Git SHA fix).
+
+The approved permanent-master redesign is tracked in
+[PERMANENT-MASTER-ROADMAP.md](PERMANENT-MASTER-ROADMAP.md). It defines six numbered
+PRs, acceptance checks, data constraints, and the exact next action. Start there
+in a new session. PR-01 is the schema and offline migration audit; production
+collection remains RC5-hotfix3 until later integration PRs.
+
+After the stabilization described below, the first monitored Daily completed:
+2,023 Princess voyages, 1,896 Celebrity voyages, 16 Celebrity configurations
+advanced, 11 legacy-saturated masters, all 32 Celebrity and 30 Princess masters
+validated. Four registry voyages remain unproven and zero conflicts were recorded.
+Git SHA logging still needs the PR-02 fix described in the roadmap. The verification
+and inventory sections below record the earlier stabilization baseline.
+
 ## Current source
 
 - Stabilization release: `1.0.0-rc5-hotfix3`.

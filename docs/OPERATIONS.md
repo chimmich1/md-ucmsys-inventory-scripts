@@ -119,3 +119,12 @@ python -m pip install -r requirements.txt
 ```
 
 RC5 must not be promoted to 1.0.0 until this sequence succeeds from a virgin clone.
+# Offline permanent-master planning
+
+Run `python master/audit-permanent-masters.py --state work/state --out-dir work/logs/permanent-master-pr01`
+to compare saved masters using `config/ship-classes.json`. Review both report files.
+Shared-field candidates are evidence-based proposals, not automatic inheritance.
+Conflicts and unknowns require explicit migration decisions. Legacy saturation
+does not establish completeness. Audit output must be outside state and data.
+PR-01 does not migrate state or change Daily. See `PERMANENT-MASTER-ROADMAP.md`
+for the remaining numbered PRs and `PERMANENT-MASTER-CONTRACT.md` for contracts.

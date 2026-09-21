@@ -38,3 +38,19 @@ See `docs/OPERATIONS.md`, `docs/ARCHITECTURE.md`, and `docs/FILE-REFERENCE.md`.
 For development, install `pytest` and run `python -m pytest tests -q`. The suite
 includes the historical registry scripts; Windows stderr integration tests require
 Windows PowerShell 5.1. See `docs/PROJECT-HANDOFF.md` for the stabilization status.
+
+The approved permanent-master redesign and numbered PR sequence are in
+[docs/PERMANENT-MASTER-ROADMAP.md](docs/PERMANENT-MASTER-ROADMAP.md).
+# Offline permanent-master audit (PR-01)
+
+The [implementation roadmap](docs/PERMANENT-MASTER-ROADMAP.md) records the six
+numbered PRs. The [proposed contracts](docs/PERMANENT-MASTER-CONTRACT.md) describe
+the future physical, category, and assignment masters. Current collector formats
+remain unchanged.
+
+```powershell
+python master/audit-permanent-masters.py --state work/state --out-dir work/logs/permanent-master-pr01
+```
+
+This reads the collected masters, verifies their catalog hashes, and writes JSON
+and Markdown reports. It makes no provider calls and publishes no masters.
