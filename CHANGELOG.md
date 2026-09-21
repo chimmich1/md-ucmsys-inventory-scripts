@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.0.0 — 2026-09-21
+
+- Promote the permanent-master collector after clean-room Full, Validate,
+  reuse-mode Daily, and final Validate acceptance.
+- Include transactional permanent snapshots, independent physical/category/
+  assignment coverage, targeted maintenance, catalog recovery, complete logging,
+  and class-aware discovery reuse from the RC5 implementation series.
+- Preserve fail-closed behavior when Celebrity reports an incomplete pagination
+  result; the prior validated artifact remains active.
+
+The following PR sections record the implementation history for this release.
+
 ## Unreleased — class-aware discovery PR-07
 
 - Add an offline class-aware discovery plan derived from the active immutable
@@ -21,7 +33,7 @@
 - Add an offline audit of published masters: shared field candidates, conflicts,
   unknown attributes, category definitions, and assignment differences.
 - Verify input hashes and reject audit output within cumulative state/data.
-  Production collector formats and VERSION remain 1.0.0-rc5-hotfix3.
+  The implementation was developed from the RC5 format and promoted by PR-08.
 
 ## Unreleased — operational logging PR-02
 

@@ -1,4 +1,4 @@
-# Universal Cruise Master Collector — 1.0.0-rc5-hotfix3
+# Universal Cruise Master Collector — 1.0.0
 
 Code-only collector. Git intentionally contains **no collected cruise data**.
 An existing working copy can contain required cumulative runtime state in ignored
