@@ -15,3 +15,5 @@ metadata while allowing additive provider-native fields.
 
 Validate manifest hashes before accepting a permanent-master snapshot and retain
 the `sources` arrays as provenance.
+
+- inventory-observation-v1.1.schema.json — universal voyage-scoped availability and pricing observation; dynamic data remains separate from permanent masters.

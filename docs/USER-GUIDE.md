@@ -365,3 +365,7 @@ catalogs inside Validate and never run Full against migrated state.
 For a fresh Celebrity pagination mismatch, the collector is intentionally fail
 closed. Preserve the previous validated artifact, retain the complete stderr/log,
 and retry only after the source response is complete and internally consistent.
+
+## Dynamic inventory observations
+
+PR-09 introduces the universal observation envelope in schemas/inventory-observation-v1.1.schema.json. Archived Celebrity v1.5 records can be converted with observations/celebrity_v15_to_universal.py; observations retain availability, pricing, checkout evidence, provenance, and partial-deck status separately from permanent masters.
