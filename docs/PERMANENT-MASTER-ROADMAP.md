@@ -7,10 +7,11 @@ collected data, then maintain them through targeted discovery. Routine voyages
 must not trigger repeated discovery of established physical cabin facts.
 
 Current work: **PR-05, maintenance-mode collector integration**.
-Branch: `feat/pr05-maintenance-integration`. PR-04 merged as GitHub PR 5; PR-03
-as GitHub PR 4; PR-02 as GitHub PR 3; PR-01 as GitHub PR 2. PR sequence numbers
-below are stable roadmap IDs, not GitHub issue numbers. Each PR depends on the
-preceding merged PR unless explicitly noted.
+Branch: `feat/pr05-maintenance-integration`. Draft GitHub PR 6:
+https://github.com/chimmich1/md-ucmsys-inventory-scripts/pull/6. PR-04 merged as
+GitHub PR 5; PR-03 as GitHub PR 4; PR-02 as GitHub PR 3; PR-01 as GitHub PR 2.
+PR sequence numbers below are stable roadmap IDs, not GitHub issue numbers. Each
+PR depends on the preceding merged PR unless explicitly noted.
 
 PR-05 implementation is ready for review. Next action after merge: PR-06 performs
 migrated-state and clean-room release acceptance, operator documentation, measured
