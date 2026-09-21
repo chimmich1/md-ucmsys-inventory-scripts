@@ -18,3 +18,20 @@ function Invoke-NativeCommand {
     throw "Native command failed: $Executable (exit code $nativeExitCode)"
   }
 }
+
+function Get-GitCommitSha {
+  param([Parameter(Mandatory=$true)][string]$Repository)
+  if (!(Test-Path (Join-Path $Repository ".git"))) { return "UNKNOWN" }
+  try {
+    # Capture all output and the native exit code before inspecting the result.
+    # Piping to Select-Object -First 1 terminates git early on PowerShell 5.1 and
+    # can change LASTEXITCODE to -1 even though the SHA was emitted.
+    $output = @(& git -C $Repository rev-parse HEAD 2>$null)
+    $nativeExitCode = $LASTEXITCODE
+    if ($nativeExitCode -eq 0 -and $output.Count -gt 0) {
+      $candidate = [string]$output[0]
+      if ($candidate -match '^[0-9a-fA-F]{40}$') { return $candidate.ToLowerInvariant() }
+    }
+  } catch {}
+  return "UNKNOWN"
+}

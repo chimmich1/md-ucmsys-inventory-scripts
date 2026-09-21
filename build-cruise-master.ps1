@@ -10,7 +10,8 @@ param(
   [switch]$ResumeAtCelebrityMasters,
   [switch]$ResumeAtPrincessMasters,
   [switch]$SkipVoyageRefresh,
-  [switch]$RestartRun
+  [switch]$RestartRun,
+  [string]$LogPath = ""
 )
 $ErrorActionPreference="Stop"
 $script=Join-Path $PSScriptRoot "pipeline\build-cruise-master.ps1"
@@ -52,4 +53,35 @@ if ($RestartRun) {
     $params.RestartRun = $true
 }
 
-& $script @params
+$logs = Join-Path $PSScriptRoot "work\logs"
+if (!$LogPath) {
+    $stamp = (Get-Date).ToUniversalTime().ToString("yyyyMMdd-HHmmss")
+    $LogPath = Join-Path $logs "$($Mode.ToLowerInvariant())-v$((Get-Content -Raw (Join-Path $PSScriptRoot 'VERSION')).Trim())-$stamp.log"
+}
+$logParent = Split-Path -Parent $LogPath
+New-Item -ItemType Directory -Force -Path $logParent | Out-Null
+Write-Host "Run log: $LogPath"
+
+$childArguments = @("-NoLogo", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", $script,
+    "-Mode", $Mode, "-SurveyStart", $SurveyStart, "-Python", $Python)
+foreach ($name in @("DataDir", "StateDir", "RegistryPath")) {
+    if ($params.ContainsKey($name)) { $childArguments += @("-$name", [string]$params[$name]) }
+}
+foreach ($name in @("SkipVoyageRefresh", "ReuseAcquiredVoyages", "ResumeAtPrincessMasters",
+                     "ResumeAtCelebrityMasters", "RestartRun")) {
+    if ($params.ContainsKey($name) -and $params[$name]) { $childArguments += "-$name" }
+}
+
+$savedPreference = $ErrorActionPreference
+try {
+    $ErrorActionPreference = "Continue"
+    & powershell.exe @childArguments 2>&1 |
+        ForEach-Object { $_.ToString() } |
+        Tee-Object -FilePath $LogPath
+    $pipelineExitCode = $LASTEXITCODE
+} finally {
+    $ErrorActionPreference = $savedPreference
+}
+if ($pipelineExitCode -ne 0) {
+    throw "Pipeline failed with exit code $pipelineExitCode. Complete output: $LogPath"
+}

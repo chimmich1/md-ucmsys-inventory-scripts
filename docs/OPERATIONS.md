@@ -35,13 +35,21 @@ This repairs a completed promotion/catalog gap; it is not a rollback mechanism
 for arbitrary damage or a partially promoted, inconsistent master/report pair.
 Investigate such inconsistencies rather than deleting cumulative state.
 
-All pipeline Python stages preserve complete stderr under Windows PowerShell 5.1
-and fail on the exit code after diagnostics have been emitted. For a run log:
+All root pipeline runs automatically create a timestamped log under `work/logs`.
+The path is printed before work starts. `-LogPath` selects a stable destination:
 
 ```powershell
-.\build-cruise-master.ps1 -Mode Validate *>&1 |
-    Tee-Object -FilePath .\work\logs\validate.log
+.\build-cruise-master.ps1 -Mode Validate -LogPath .\work\logs\validate.log
 ```
+
+The wrapper runs the pipeline in a child PowerShell process, drains stdout and
+stderr to both console and file, and only then returns the exit code. This keeps
+complete Python tracebacks under Windows PowerShell 5.1. Stage completion/failure
+includes elapsed seconds. Princess itinerary acquisition logs every 25th request
+and a final matched/fallback/failure summary; it does not use `Write-Progress`.
+Celebrity discovery separately labels failures added by the current run and older
+failures retained as evidence. A historical notice alone does not mean the current
+run's provider calls failed.
 
 ## Starting from zero
 

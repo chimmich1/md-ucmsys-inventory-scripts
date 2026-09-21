@@ -9,6 +9,18 @@
 - Verify input hashes and reject audit output within cumulative state/data.
   Production collector formats and VERSION remain 1.0.0-rc5-hotfix3.
 
+## Unreleased — operational logging PR-02
+
+- Create a timestamped log under `work/logs` for every root pipeline invocation;
+  `-LogPath` selects an explicit destination. Preserve complete child-process
+  output and return failure only after the log is drained.
+- Capture Git provenance without an early-terminating PowerShell 5.1 pipeline,
+  preventing valid repository runs from recording `gitSha: UNKNOWN`.
+- Replace the Princess progress display with durable request counters and a final
+  matched/fallback/failure summary suitable for console and file logs.
+- Report stage duration on success and failure, and distinguish current Celebrity
+  API failures from failures retained in historical voyage evidence.
+
 ## 1.0.0-rc5-hotfix3
 
 - Reconcile every existing Celebrity catalog entry against its local published

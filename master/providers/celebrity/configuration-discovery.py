@@ -14,6 +14,17 @@ BASE = "https://www.celebritycruises.com"
 ROOMS_API = BASE + "/room-selection/api/v1/rooms"
 
 
+def failure_summary_lines(total, current):
+    historical = max(0, total - current)
+    lines = [f"  Current-run failures:      {current}",
+             f"  Historical failures:       {historical}"]
+    if current:
+        lines.append("WARNING: current discovery/API calls failed. Review this run before declaring saturation.")
+    elif historical:
+        lines.append("NOTICE: saved voyage history contains failures; this run added no failures.")
+    return lines
+
+
 def load_json(path):
     with open(path, "r", encoding="utf-8-sig") as f:
         return json.load(f)
@@ -1253,6 +1264,8 @@ def main():
     print(f"  New target categories:     {len(target_categories - baseline_target_categories)}")
     print(f"  New target category/decks: {len(target_category_decks - baseline_target_category_decks)}")
     print(f"  Total failures:            {validation['failureCount']}")
+    for line in failure_summary_lines(validation["failureCount"], validation["currentRunFailureCount"]):
+        print(line)
     print(f"  Cabin/deck conflicts:      {len(conflicts)}")
     print(f"  Eligible target voyages:   {len(eligible)}")
     print(f"  Tail no-change:            {tail_no_change}")
@@ -1268,11 +1281,6 @@ def main():
             f"fingerprint={c['configurationFingerprint']}"
         )
     print(f"  Output:                    {output.resolve()}")
-
-    if validation["failureCount"]:
-        print()
-        print("WARNING: one or more discovery/API calls failed. Review validation before declaring saturation.")
-
 
 if __name__ == "__main__":
     main()

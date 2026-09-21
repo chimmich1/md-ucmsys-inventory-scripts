@@ -333,15 +333,20 @@ $headers = @{
 
 $all = @()
 $i = 0
+$failed = 0
+$fallbackRequests = 0
 foreach($id in $ids){
   $i++
-  Write-Progress -Activity "Princess itineraries" -Status "$i / $($ids.Count)" -PercentComplete (($i*100)/$ids.Count)
+  if($i -eq 1 -or $i -eq $ids.Count -or ($i % 25) -eq 0){
+    Write-Host "Princess itinerary requests: $i / $($ids.Count) (voyage $id)"
+  }
 
   $uri = "https://gw.api.princess.com/pcl-web/internal/resdb/p1.0/itineraries?cruises=$id"
   try {
     $r = Invoke-RestMethod -Uri $uri -Headers $headers -UserAgent $session.UserAgent
     $hit = @($r.cruises | Where-Object { [string]$_.id -eq $id })
     if(!$hit){
+      $fallbackRequests++
       $uri += "&voyageCode=$id"
       $r = Invoke-RestMethod -Uri $uri -Headers $headers -UserAgent $session.UserAgent
       $hit = @($r.cruises | Where-Object { [string]$_.id -eq $id })
@@ -349,10 +354,11 @@ foreach($id in $ids){
     if($hit){ $all += $hit }
   }
   catch {
+    $failed++
     Write-Warning "Itinerary $id failed: $($_.Exception.Message)"
   }
 }
-Write-Progress -Activity "Princess itineraries" -Completed
+Write-Host "Princess itinerary request summary: voyages=$($ids.Count); matched=$($all.Count); fallbackRequests=$fallbackRequests; failed=$failed"
 
 [pscustomobject]@{ cruises=$all } |
   ConvertTo-Json -Depth 20 -Compress |
