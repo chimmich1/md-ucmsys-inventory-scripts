@@ -15,3 +15,5 @@ provider.
 For JSON-only full-ship jobs, deck_codes_from_master.py extracts the known deck selector values from the active published physical master. The collector should query those values through the provider's JSON request envelope and fail closed if any requested deck is not returned.
 
 celebrity_json_inventory.py contains the JSON-only deck enumeration core. It places the requested deck in ooms[0].room.deckCode, queries every deck supplied by the physical master, retains raw JSON evidence, and fails closed when a requested deck is absent. Transport wiring remains explicit and provider-only.
+
+category_pricing.py normalizes the provider's category pricing and cabin membership from each oomNumbers response while preserving the native pricing object.
