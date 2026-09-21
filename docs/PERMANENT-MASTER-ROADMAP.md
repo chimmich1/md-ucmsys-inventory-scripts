@@ -7,10 +7,10 @@ collected data, then maintain them through targeted discovery. Routine voyages
 must not trigger repeated discovery of established physical cabin facts.
 
 Current work: **PR-02, operational logging and provenance**.
-Branch: `fix/pr02-operational-logging`. PR-01 merged as GitHub PR 2:
-https://github.com/chimmich1/md-ucmsys-inventory-scripts/pull/2. PR sequence
-numbers below are stable roadmap IDs, not GitHub issue numbers. Each PR depends
-on the preceding merged PR unless explicitly noted.
+Branch: `fix/pr02-operational-logging`. Draft GitHub PR 3:
+https://github.com/chimmich1/md-ucmsys-inventory-scripts/pull/3. PR-01 merged as
+GitHub PR 2. PR sequence numbers below are stable roadmap IDs, not GitHub issue
+numbers. Each PR depends on the preceding merged PR unless explicitly noted.
 
 PR-01 implementation is ready for review: proposed contracts are documented in
 `PERMANENT-MASTER-CONTRACT.md`; serialization and active snapshot publication
