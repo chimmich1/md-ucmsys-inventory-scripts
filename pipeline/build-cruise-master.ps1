@@ -57,21 +57,23 @@ function Step([string]$Name,[scriptblock]$Block,[switch]$Always){
   } | ConvertTo-Json | Set-Content -Encoding UTF8 $startedMarker
   try {
     & $Block
+    $elapsed=[math]::Round(((Get-Date).ToUniversalTime()-$started).TotalSeconds,3)
     [pscustomobject]@{
       stage=$Name
       runKey=$RunKey
       completedAt=(Get-Date).ToUniversalTime().ToString("o")
-      elapsedSeconds=[math]::Round(((Get-Date).ToUniversalTime()-$started).TotalSeconds,3)
+      elapsedSeconds=$elapsed
     } | ConvertTo-Json | Set-Content -Encoding UTF8 $marker
     Remove-Item -Force -ErrorAction SilentlyContinue $startedMarker
-    Write-Host "CHECKPOINT: completed." -ForegroundColor DarkGray
+    Write-Host "CHECKPOINT: completed in $elapsed seconds." -ForegroundColor DarkGray
   } catch {
+    $elapsed=[math]::Round(((Get-Date).ToUniversalTime()-$started).TotalSeconds,3)
     [pscustomobject]@{
       stage=$Name; runKey=$RunKey; failedAt=(Get-Date).ToUniversalTime().ToString("o")
-      error=$_.Exception.Message
+      elapsedSeconds=$elapsed; error=$_.Exception.Message
     } | ConvertTo-Json | Set-Content -Encoding UTF8 $failedMarker
     Remove-Item -Force -ErrorAction SilentlyContinue $startedMarker
-    throw "$Name failed: $($_.Exception.Message)"
+    throw "$Name failed after $elapsed seconds: $($_.Exception.Message)"
   }
 }
 function Require([string]$p){if(!(Test-Path $p)){throw "Missing required file: $p"}}
@@ -107,7 +109,7 @@ if($Mode -eq "Validate"){
   if(@($r.conflicts).Count -gt 0){throw "Registry contains physical-configuration conflicts"}
   Invoke-NativeCommand -Executable $Python -Arguments @((Join-Path $RepoRoot "master\validate-masters.py"), "--state", $StateDir)
   Write-Host "Validation complete (read-only)." -ForegroundColor Green
-  exit 0
+  return
 }
 
 
@@ -214,15 +216,7 @@ Step "Validate generated masters" {
 Step "Publish run manifest" {
   # Release ZIPs intentionally contain no .git directory. Git provenance is
   # optional metadata and must not make an otherwise valid clean-room run fail.
-  $gitSha="UNKNOWN"
-  if(Test-Path (Join-Path $RepoRoot ".git")){
-    try {
-      $candidate = (& git -C $RepoRoot rev-parse HEAD 2>$null | Select-Object -First 1)
-      if($LASTEXITCODE -eq 0 -and $candidate){$gitSha=$candidate}
-    } catch {
-      $gitSha="UNKNOWN"
-    }
-  }
+  $gitSha=Get-GitCommitSha -Repository $RepoRoot
   $manifest=[ordered]@{
     schemaVersion="1.0"; pipelineVersion=$PipelineVersion; gitSha=$gitSha;
     mode=$Mode; surveyStartDate=$SurveyStart; generatedAtUtc=(Get-Date).ToUniversalTime().ToString("o");

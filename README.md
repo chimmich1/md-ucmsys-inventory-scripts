@@ -4,6 +4,10 @@ Code-only collector. Git intentionally contains **no collected cruise data**.
 An existing working copy can contain required cumulative runtime state in ignored
 `work/data` and `work/state`; preserve both directories when upgrading.
 
+Every root command writes the same complete output shown in the console to a
+timestamped file under `work/logs`. Use `-LogPath <path>` for a specific name.
+Princess collection reports durable request counts rather than a progress display.
+
 ## Existing installations and relocated runtime state
 
 Do not run Full on the migrated cumulative state. To repair catalog metadata and

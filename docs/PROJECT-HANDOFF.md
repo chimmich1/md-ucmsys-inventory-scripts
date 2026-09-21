@@ -2,11 +2,13 @@
 
 ## Active next steps
 
-PR-01 is implemented on `feat/permanent-master-foundation`: proposed contracts,
-class configuration, and offline audit. All 44 tests pass; existing Validate
-passes all 62 masters. The deterministic report is in ignored
-`work/logs/permanent-master-pr01`. No production migration or provider calls were
-performed. After review/merge, continue PR-02 (durable logging and Git SHA fix).
+PR-01 merged as GitHub PR 2. PR-02 is implemented on
+`fix/pr02-operational-logging`: automatic timestamped root logs, complete failure
+logs and exit codes, safe Git SHA capture, stage timing, Princess request counters,
+and current-versus-historical Celebrity failure labels. All 49 tests pass under
+Python 3.14/Windows PowerShell 5.1; read-only Validate passes all 62 masters and
+writes only its selected ignored log. No provider calls were made. After PR-02
+review/merge, continue PR-03 transactional three-master materialization.
 
 The approved permanent-master redesign is tracked in
 [PERMANENT-MASTER-ROADMAP.md](PERMANENT-MASTER-ROADMAP.md). It defines six numbered
@@ -18,8 +20,9 @@ After the stabilization described below, the first monitored Daily completed:
 2,023 Princess voyages, 1,896 Celebrity voyages, 16 Celebrity configurations
 advanced, 11 legacy-saturated masters, all 32 Celebrity and 30 Princess masters
 validated. Four registry voyages remain unproven and zero conflicts were recorded.
-Git SHA logging still needs the PR-02 fix described in the roadmap. The verification
-and inventory sections below record the earlier stabilization baseline.
+The earlier Daily's UNKNOWN Git SHA was corrected in PR-02; its historical manifest
+is not rewritten. The verification and inventory sections below record the earlier
+stabilization baseline.
 
 ## Current source
 

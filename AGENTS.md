@@ -22,6 +22,9 @@
   physical configurations from unrelated sailings.
 - Publish catalog JSON atomically. Preserve full native stderr under Windows
   PowerShell 5.1 before failing on a nonzero exit code; use pipeline/invoke-native.ps1.
+- Invoke the root script for operational runs so output is automatically copied to
+  a timestamped `work/logs` file. Do not reintroduce `Write-Progress`; progress and
+  request summaries must be durable log lines.
 - Run `python -m pytest tests -q` after behavioral changes. It includes both legacy
   registry script regressions. Run the root pipeline's Validate on migrated state
   when available, and report skipped checks or limitations accurately.
