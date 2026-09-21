@@ -69,3 +69,15 @@ The command writes physical, category, and assignment documents for each provide
 verifies and promotes their complete snapshot directory, then atomically switches
 `static-masters/permanent-masters/active-snapshot.json`. Legacy catalogs remain
 present and authoritative during this migration stage.
+
+Assess the active proposed snapshot and write an offline targeted queue:
+
+```powershell
+python master/assess-permanent-masters.py `
+  --snapshot-root work/state/static-masters/permanent-masters `
+  --out work/logs/permanent-master-assessment.json
+```
+
+Use `--manual-target CELEBRITY/EG` or `--factory-refresh-target PRINCESS/SU`
+to add an explicit ship-level physical verification. Unsupported measurements are
+reported as discovery-stalled and are not automatically recollected.

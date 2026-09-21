@@ -18,6 +18,9 @@
 | `master/reconcile-catalogs.py` | Offline catalog recovery and relocation without collection. | Two catalogs and Celebrity manifest only |
 | `master/materialize-permanent-masters.py` | Builds and transactionally activates an immutable proposed permanent-master snapshot from local evidence. | `static-masters/permanent-masters` |
 | `master/activate-permanent-master-snapshot.py` | Verifies and atomically activates an existing snapshot for rollback. | Permanent-master active pointer |
+| `master/assess-permanent-masters.py` | Evaluates independent completion dimensions and writes a targeted offline refresh queue. | Caller-selected report |
+| `master/permanent_master_policy.py` | Applies required/stalled fields, proofs, conflicts, assignments, and explicit refresh triggers. | None (pure assessment) |
+| `config/permanent-master-refresh-policy.json` | Required fields, stalled fields, allowed triggers, and periodic verification intervals. | Policy input |
 | `master/permanent_master_snapshot.py` | Deterministic snapshot construction, publication, restart recovery, and validation. | Caller-selected snapshot root |
 | `pipeline/invoke-native.ps1` | Preserves complete native stderr before checking exit codes. | No |
 | `master/providers/celebrity/configuration-discovery.py` | Configuration-aware Celebrity cabin/category saturation collector. | Caller-selected runtime directory |
