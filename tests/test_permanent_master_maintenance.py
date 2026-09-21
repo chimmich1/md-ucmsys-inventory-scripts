@@ -27,6 +27,11 @@ def test_unchanged_complete_snapshot_plans_and_executes_zero_collectors(tmp_path
     assert plan == []
     assert commands == []
     assert calls == []
+    summary = maintenance.class_aware_summary(plan, published, published,
+        {("CELEBRITY", "AA"): "edge", ("PRINCESS", "AP"): "grand"})
+    assert summary["targetedSourceCount"] == 0
+    assert summary["skippedSourceCount"] == 2
+    assert summary["byClass"]["edge"] == {"targeted": 0, "skipped": 1}
 
 
 def test_targeted_items_are_grouped_into_one_bounded_builder_per_provider(tmp_path):
@@ -48,6 +53,10 @@ def test_targeted_items_are_grouped_into_one_bounded_builder_per_provider(tmp_pa
     assert celebrity[celebrity.index("--configuration-filter") + 1] == "AA/1"
     assert princess[princess.index("--configuration-filter") + 1] == "AP/4"
     assert princess[princess.index("--deck-targets") + 1] == '{"AP/4":[8]}'
+    summary = maintenance.class_aware_summary(plan, published, published,
+        {("CELEBRITY", "AA"): "edge", ("PRINCESS", "AP"): "grand"})
+    assert summary["targetedSourceCount"] == 2
+    assert summary["skippedSourceCount"] == 0
 
 
 def test_new_configuration_bootstraps_all_dimensions_once():

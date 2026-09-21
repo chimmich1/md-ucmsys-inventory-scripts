@@ -7,7 +7,8 @@ from pathlib import Path
 
 from catalog_state import dump
 from permanent_master_maintenance import (execute, known_sources, make_plan,
-                                          refresh_snapshot, snapshot_sources)
+                                          refresh_snapshot, snapshot_sources,
+                                          class_memberships, class_aware_summary)
 from permanent_master_policy import assess
 
 
@@ -38,6 +39,8 @@ def main():
                       if value.get("snapshotId") == assessment["snapshotId"] and
                       value.get("policySha256") == assessment["policySha256"]}
     plan = make_plan(assessment, known, published, active_stalled)
+    reuse_summary = class_aware_summary(
+        plan, known, published, class_memberships(repo / "config/ship-classes.json"))
     execute(plan, repo, args.state, args.data, args.celebrity_voyages, args.princess_voyages,
             args.registry, args.python)
     if plan:
@@ -54,7 +57,8 @@ def main():
               "collectorInvocationCount": len({x["provider"] for x in plan}),
               "resultingSnapshotId": assessment["snapshotId"],
               "stalledWorkCount": len(maintenance_state["stalledWork"]),
-              "remainingQueueSummary": assessment["queueSummary"]}
+              "remainingQueueSummary": assessment["queueSummary"],
+              "classAwareDiscovery": reuse_summary}
     dump(args.out, report)
     print(json.dumps(report, indent=2))
 
