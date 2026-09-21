@@ -11,9 +11,18 @@ Branch: `feat/permanent-master-foundation`. GitHub PR link will be recorded here
 when opened. PR sequence numbers below are stable roadmap IDs, not GitHub issue
 numbers. Each PR depends on the preceding merged PR unless explicitly noted.
 
-Next action: implement and test the proposed schemas and a read-only audit of
-the existing catalogued masters. Generate a review report under ignored
-`work/logs`; do not publish a replacement master or call providers in PR-01.
+PR-01 implementation is ready for review: proposed contracts are documented in
+`PERMANENT-MASTER-CONTRACT.md`; serialization and active snapshot publication
+remain PR-03 work. The offline audit and regression tests are implemented.
+Next action after PR-01 review/merge: start PR-02 logging and Git SHA capture.
+Do not publish replacement masters or call providers as part of PR-01/PR-02.
+
+Verification: 44 tests passed; read-only Validate passed for 32 Celebrity and
+30 Princess configurations. Two audits produced identical report hashes.
+Report: `work/logs/permanent-master-pr01/migration-audit.json` and `.md` (ignored).
+Audit covered 62 masters/32 ships, six supplied classes and eight ship-only groups;
+59,789 shared-field candidates and 2,097 variant fields. Inputs were hash-checked
+before/after the audit; runtime state/data were not modified.
 
 ## Agreed design
 
@@ -46,7 +55,7 @@ gaps. Unmapped ships remain ship-specific until explicitly classified.
 
 | PR | Scope | Required acceptance | Status |
 |---|---|---|---|
-| **PR-01** | Persist this roadmap; define physical/category/assignment schema contracts; encode the supplied ship classes; implement offline migration audit with shared values, ship exceptions, unknowns, conflicts, and coverage gaps. | Synthetic regression tests; deterministic report against local masters; verify source hashes and no runtime input writes; existing Validate still passes. No collector behavior changes. | In progress |
+| **PR-01** | Persist this roadmap; define physical/category/assignment schema contracts; encode the supplied ship classes; implement offline migration audit with shared values, ship exceptions, unknowns, conflicts, and coverage gaps. | Synthetic regression tests; deterministic report against local masters; verify source hashes and no runtime input writes; existing Validate still passes. No collector behavior changes. | Ready for review |
 | **PR-02** | Operational logging and provenance: fix PowerShell Git SHA early-pipeline termination; automatic timestamped run logs; replace progress bars with request counters; stage timing, retries, failure summaries, and current-vs-historical warnings. | PowerShell 5.1 tests for SHA capture, full stderr, progress reaching logs, failure exit codes, and read-only Validate. Test without live collection. | Planned |
 | **PR-03** | Materialize the new three-master structure from existing evidence; class defaults plus confirmed membership/field overrides; explicit revision/applicability records; independent physical/commercial identities; transactional snapshot publication, restart and rollback support. | Old/new confirmed facts reconcile; exceptions and unknowns retained; no destructive migration; interrupted publish leaves a consistent active snapshot; new and legacy readers validate. | Planned |
 | **PR-04** | Completion and refresh policy: independent coverage states, evidence-backed completeness checks, stalled discovery, manual refresh, periodic verification policy, and targeted discovery queue. | Unknown balcony size does not cause endless discovery; stalled is not complete; unchanged completed ships queue no physical calls; ambiguous evidence remains flagged. | Planned |

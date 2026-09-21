@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased — permanent-master PR-01
+
+- Commit the six-PR implementation roadmap and proposed three-master contracts.
+- Record user-supplied ship classes, with ship-only fallback for unmapped ships.
+- Add an offline audit of published masters: shared field candidates, conflicts,
+  unknown attributes, category definitions, and assignment differences.
+- Verify input hashes and reject audit output within cumulative state/data.
+  Production collector formats and VERSION remain 1.0.0-rc5-hotfix3.
+
 ## 1.0.0-rc5-hotfix3
 
 - Reconcile every existing Celebrity catalog entry against its local published

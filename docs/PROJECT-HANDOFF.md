@@ -2,6 +2,12 @@
 
 ## Active next steps
 
+PR-01 is implemented on `feat/permanent-master-foundation`: proposed contracts,
+class configuration, and offline audit. All 44 tests pass; existing Validate
+passes all 62 masters. The deterministic report is in ignored
+`work/logs/permanent-master-pr01`. No production migration or provider calls were
+performed. After review/merge, continue PR-02 (durable logging and Git SHA fix).
+
 The approved permanent-master redesign is tracked in
 [PERMANENT-MASTER-ROADMAP.md](PERMANENT-MASTER-ROADMAP.md). It defines six numbered
 PRs, acceptance checks, data constraints, and the exact next action. Start there

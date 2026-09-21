@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "1.0",
+  "source": "User-supplied class groupings; codes matched to collected ship records",
+  "classes": [
+    {"provider": "PRINCESS", "classId": "sphere", "shipCodes": ["SU", "ST"]},
+    {"provider": "PRINCESS", "classId": "royal", "shipCodes": ["RP", "GP", "MJ", "YP", "EX", "XP"]},
+    {"provider": "PRINCESS", "classId": "grand", "shipCodes": ["AP", "CB", "KP", "EP", "RU"]},
+    {"provider": "PRINCESS", "classId": "coral", "shipCodes": ["CO", "IP"]},
+    {"provider": "CELEBRITY", "classId": "edge", "shipCodes": ["EG", "AX", "BY", "AT"]},
+    {"provider": "CELEBRITY", "classId": "solstice", "shipCodes": ["SL", "EQ", "EC", "SI", "RF"]}
+  ],
+  "unmappedPolicy": "SHIP_ONLY",
+  "notes": [
+    "Golden Princess and the older Grand-class Star Princess are not present in the collected catalogs and have no assigned code here.",
+    "ST is the collected Sphere-class Star Princess; never classify a ship using its name alone.",
+    "Diamond, Sapphire, Flora, Xcel and the four collected Celebrity Millennium-class ships remain unmapped; no class membership was inferred for them."
+  ]
+}
