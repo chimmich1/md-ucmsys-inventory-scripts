@@ -6,6 +6,9 @@
 - Permanent-master publication promotes and verifies a complete immutable snapshot
   before atomically changing its active pointer. Preserve legacy catalogs during
   migration; absence of an active snapshot must remain valid until integration.
+- Do not treat legacy saturation, no-growth sampling, or a file timestamp as a
+  completeness proof. Stalled fields stay outside automatic refresh unless an
+  operator, factory refresh, or changed evidence/policy explicitly requeues them.
 - Read README.md, VERSION, CHANGELOG.md, docs/PROJECT-HANDOFF.md, and relevant
   documentation before changes. Inspect Git status and history; preserve user edits.
 - `work/state` and `work/data` are required cumulative runtime state, not disposable

@@ -12,6 +12,15 @@ one active pointer. An interruption before the pointer leaves the prior snapshot
 active; rerunning verifies the promoted directory and completes activation.
 Legacy catalogs and readers remain valid when no active pointer exists.
 
+PR-04 derives completion and refresh work without changing the immutable snapshot.
+The evaluator binds its output to the active snapshot ID and policy hash. It builds
+effective physical values from class defaults plus ship exceptions, checks required
+fields only for confirmed membership, flags ambiguous observations, and compares
+source membership with independent assignment revisions. Optional unavailable
+measurements are stalled outside the automatic queue. Operator and factory-refresh
+targets are explicit inputs; periodic work remains unscheduled until evidence has
+a supported verification date.
+
 ## Evidence rules
 
 - Future-only configuration discovery: `sailDate > surveyStartDate`; a voyage departing today is excluded.

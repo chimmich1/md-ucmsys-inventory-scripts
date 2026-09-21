@@ -25,3 +25,13 @@ and assignments have independent revision identities and applicability sources.
 Coverage remains `UNVERIFIED` after migration. The snapshot does not infer dates,
 completeness, or physical changes from configuration IDs. Legacy catalogs remain
 authoritative until later roadmap integration. See `PERMANENT-MASTER-CONTRACT.md`.
+
+## Completion assessment
+
+Completion is a separate derived document bound to a snapshot and policy hash.
+It tracks membership, attributes, category definitions, and assignments separately.
+`COMPLETE` always contains the rule and counts proving its limited scope;
+`INCOMPLETE` records actionable gaps; `DISCOVERY_STALLED` records a known source
+limit and retry condition; `UNVERIFIED` makes no completeness claim. Attribute and
+assignment proofs cover confirmed membership only. The refresh queue aggregates
+work by provider, ship, dimension, field, and source configuration.

@@ -34,6 +34,18 @@
 - Validate an active permanent-master snapshot when present while retaining full
   compatibility with legacy-only state. Existing catalogs remain authoritative.
 
+## Unreleased — completion and refresh policy PR-04
+
+- Evaluate membership, required physical attributes, category definitions, and
+  assignments independently; every COMPLETE state includes its scoped proof.
+- Mark unsupported per-cabin measurements `DISCOVERY_STALLED` rather than complete
+  or perpetually queued. Migrated evidence without verification dates leaves the
+  periodic schedule explicitly unscheduled.
+- Emit a deterministic targeted queue for missing required fields, contradictory
+  evidence, missing assignments, manual verification, and factory refreshes.
+- Keep legacy saturation separate from completion. Attribute and assignment proofs
+  apply only to confirmed source membership and do not prove membership complete.
+
 ## 1.0.0-rc5-hotfix3
 
 - Reconcile every existing Celebrity catalog entry against its local published

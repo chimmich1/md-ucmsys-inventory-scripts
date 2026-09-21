@@ -1,0 +1,32 @@
+{
+  "schemaVersion": "1.0",
+  "requiredPhysicalFields": {
+    "CELEBRITY": ["deckNumber", "deckName", "zones"],
+    "PRINCESS": ["deckNumber", "deckName", "zones", "areaInSqft", "numberOfBerths", "wheelchairAccessible", "bathType", "familySuite"]
+  },
+  "stalledPhysicalFields": {
+    "CELEBRITY": {
+      "areaInSqft": "Collected masters contain no verified per-cabin measurement.",
+      "balconyAreaInSqft": "Collected masters contain no verified per-cabin measurement.",
+      "balconyWidth": "Collected masters contain no verified per-cabin measurement.",
+      "balconyLength": "Collected masters contain no verified per-cabin measurement."
+    },
+    "PRINCESS": {
+      "balconyAreaInSqft": "Collected values are zero and therefore unknown.",
+      "balconyWidth": "Collected values are zero and therefore unknown.",
+      "balconyLength": "Collected values are zero and therefore unknown."
+    }
+  },
+  "automaticTriggers": ["NEW_SHIP", "NEW_CONFIGURATION", "UNKNOWN_CABIN", "CONTRADICTORY_EVIDENCE"],
+  "manualTriggers": ["MANUAL_REFRESH", "FACTORY_REFRESH"],
+  "periodicVerificationDays": {
+    "physical": 365,
+    "categoryDefinitions": 90,
+    "assignments": 30
+  },
+  "notes": [
+    "Intervals are collection policy, not inferred provider change dates.",
+    "A stalled field is retried only by an explicit manual/factory trigger or changed policy/evidence.",
+    "Completeness of attributes is scoped to confirmed membership and does not prove membership completeness."
+  ]
+}

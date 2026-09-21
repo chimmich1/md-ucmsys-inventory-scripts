@@ -161,3 +161,30 @@ python .\master\activate-permanent-master-snapshot.py --state .\work\state --sna
 ```
 
 Activation verifies every document and manifest hash before changing the pointer.
+
+## Assess completion and targeted refresh work
+
+Assessment is offline and does not alter the active snapshot:
+
+```powershell
+python .\master\assess-permanent-masters.py `
+  --snapshot-root .\work\state\static-masters\permanent-masters `
+  --out .\work\logs\permanent-master-assessment.json
+```
+
+The report separates membership, required attributes, definitions, and assignments.
+Review every `INCOMPLETE` and contradiction item. `DISCOVERY_STALLED` is not complete
+and is not automatically queued. It is retried only after policy/evidence changes or
+an explicit operator trigger:
+
+```powershell
+python .\master\assess-permanent-masters.py `
+  --snapshot-root .\work\state\static-masters\permanent-masters `
+  --manual-target CELEBRITY/EG `
+  --factory-refresh-target PRINCESS/SU `
+  --out .\work\logs\permanent-master-assessment.json
+```
+
+Periodic intervals are policy values, not inferred change dates. Migrated evidence
+has no supported `verifiedAt`, so its schedule is `UNSCHEDULED`; operators must not
+invent dates from file timestamps. PR-04 emits work but does not call providers.

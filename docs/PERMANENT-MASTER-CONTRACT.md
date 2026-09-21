@@ -70,6 +70,14 @@ selects one manifest. It promotes and verifies the immutable directory before th
 pointer update. The initial migrated coverage states are all `UNVERIFIED`, and
 legacy catalogs remain authoritative until the later collector-integration PRs.
 
+Completion assessments are derived and do not mutate an immutable snapshot.
+COMPLETE requires a scoped proof. Physical completeness covers required fields for
+confirmed membership and does not establish membership completeness. Stalled fields
+have no proof and no automatic retry; their record names the manual or policy-change
+condition. Category definitions remain unverified without an independent closed set.
+Assignments may be complete for each observed source configuration even while
+membership remains unverified.
+
 PR-01's `migration-audit.json` is a separate report, schema version 1.0. It contains
 source identities/hashes, observed ship membership, field-sharing candidates,
 conflicting field values, category variants, and assignment comparisons. Its

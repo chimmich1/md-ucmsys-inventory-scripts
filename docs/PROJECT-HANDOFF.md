@@ -2,14 +2,14 @@
 
 ## Active next steps
 
-PR-01 and PR-02 merged as GitHub PRs 2 and 3. PR-03 is implemented on
-`feat/pr03-transactional-master-snapshots`: deterministic provider-specific
-physical/category/assignment documents, immutable manifest snapshots, atomic active
-pointer, interruption recovery, and optional validation alongside legacy catalogs.
-All 55 tests pass. The real evidence produced snapshot
-`2f9195b160259a2fd5c34edd` twice under ignored `work/logs/pr03-permanent-masters`;
-runtime state was not migrated and no provider calls were made. After review/merge,
-continue PR-04 independent completion states and targeted-refresh policy.
+PR-01 through PR-03 merged as GitHub PRs 2–4. PR-04 is implemented on
+`feat/pr04-completion-refresh-policy`: independent completion proofs, stalled
+fields, explicit manual/factory triggers, unscheduled migrated periodic dates, and
+a deterministic targeted queue. All 60 tests and read-only legacy Validate pass.
+The offline real assessment is `work/logs/pr04-completion-assessment.json`: nine
+missing-field groups plus three Princess accessibility contradictions. It makes no
+provider calls or runtime-state changes. After review/merge, continue PR-05 collector
+integration with zero-call/bounded-call tests before any monitored collection.
 
 The approved permanent-master redesign is tracked in
 [PERMANENT-MASTER-ROADMAP.md](PERMANENT-MASTER-ROADMAP.md). It defines six numbered
