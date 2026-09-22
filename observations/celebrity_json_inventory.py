@@ -51,6 +51,22 @@ def room_numbers(response: Any) -> dict[str, Any] | None:
     return None
 
 
+def request_json(payload: dict[str, Any], *, endpoint: str = "https://www.celebritycruises.com/checkout/api/v1/rooms", timeout: int = 60) -> dict[str, Any]:
+    """Execute one direct JSON API request using curl_cffi browser TLS impersonation.
+
+    This is HTTP transport only: it does not launch a browser or parse HTML.
+    """
+    try:
+        from curl_cffi import requests
+    except ImportError as exc:
+        raise RuntimeError("curl_cffi is required for Celebrity JSON transport") from exc
+    response = requests.post(endpoint, json=payload, timeout=timeout, impersonate="chrome")
+    response.raise_for_status()
+    data = response.json()
+    if not isinstance(data, dict):
+        raise RuntimeError("Celebrity JSON endpoint returned a non-object response")
+    return data
+
 def collect(job: Job, selectors: list[tuple[str, str]], decks: list[str], request: Callable[[dict[str, Any]], Any]) -> list[dict[str, Any]]:
     observations: list[dict[str, Any]] = []
     expected = {str(deck).zfill(2) for deck in decks}
@@ -83,4 +99,5 @@ def publish(path: Path, observations: list[dict[str, Any]]) -> None:
     temporary = path.with_suffix(path.suffix + ".tmp")
     temporary.write_text(json.dumps(observations, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     temporary.replace(path)
+
 

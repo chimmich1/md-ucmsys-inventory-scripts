@@ -19,3 +19,5 @@ celebrity_json_inventory.py contains the JSON-only deck enumeration core. It pla
 category_pricing.py normalizes the provider's category pricing and cabin membership from each oomNumbers response while preserving the native pricing object.
 
 Successful JSON observations can be written with publish, which replaces the destination atomically through a same-directory temporary file.
+
+equest_json is the explicit direct JSON transport using curl_cffi; it performs POST requests only and has no browser or HTML scraping path.
